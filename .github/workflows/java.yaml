@@ -32,7 +32,7 @@ jobs:
             maven-${{ runner.os }}-
       # Byg og kør tests med Maven Wrapper
       - name: Build & test
-        run: ./mvnw -B verify -DskipTests
+        run: ./mvnw -B verify
 
   docker-build:
     runs-on: ubuntu-latest
