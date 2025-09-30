@@ -1,13 +1,25 @@
 package org.example.adventurexp.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "activities")
 public class Activity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
     private int minAge;
     private int minParticipants;
     private int maxParticipants;
     private int durationMinutes;
     private int parallelUnits;
+
+    // @Column(name = "equipment_ref") eller er det @Column(name = "equipmentRef")?
     private String equipmentRef;
 
     public Activity() {
