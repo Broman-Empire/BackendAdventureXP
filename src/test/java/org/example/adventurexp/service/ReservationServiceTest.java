@@ -1,6 +1,7 @@
 package org.example.adventurexp.service;
 
 import org.example.adventurexp.model.ReservationItem;
+import org.example.adventurexp.repository.ActivityRepository;
 import org.example.adventurexp.repository.ReservationItemRepository;
 import org.example.adventurexp.repository.ReservationRepository;
 import org.junit.jupiter.api.Test;
@@ -21,9 +22,11 @@ public class ReservationServiceTest {
     ReservationRepository reservationRepository;
     @Mock
     ReservationItemRepository reservationItemRepository;
+    @Mock
+    ActivityRepository activityRepository;
 
     private ReservationService service() {
-        return new ReservationService(reservationRepository, reservationItemRepository);
+        return new ReservationService(reservationRepository, reservationItemRepository, activityRepository);
     }
 
     private ReservationItem item(String startsAt, String endsAt) {
@@ -58,4 +61,8 @@ public class ReservationServiceTest {
         assertDoesNotThrow(() -> service().ensureNoOverlaps(null));
         assertDoesNotThrow(() -> service().ensureNoOverlaps(List.of())); // passes if no exception is thrown
     }
+
+
+    // TODO: write tests for validateReservation when Slot/Equipment backend is implemented
+
 }
