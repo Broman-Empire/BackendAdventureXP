@@ -1,0 +1,54 @@
+name: Java CI (backend)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [ main, development, qa ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c69035a3f3f8e7fc83d99c4c7df8b189b9194e  # v5
+        # fetch-depth kan sættes til 0 hvis du har brug for hele historikken
+        with:
+          fetch-depth: 1
+
+      - name: Set up Temurin JDK 21 + Maven cache
+        uses: actions/setup-java@dded0887c1bb9db86a6b02a2d2f7fa4decb420b7  # v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          # Hvis dit repo er monorepo, kan du sætte en specifik POM her:
+          # cache-dependency-path: 'backend/pom.xml'
+
+      - name: Build & test (Maven wrapper hvis tilgængelig)
+        run: |
+          set -e
+          if [ -x "./mvnw" ]; then
+            ./mvnw -B -ntp clean verify
+          else
+            mvn -B -ntp clean verify
+          fi
+
+      - name: Upload Surefire/Failsafe reports (altid)
+        if: always()
+        uses: actions/upload-artifact@ea165f8d35bff7fa1c5a2dbac3690d2d447dded1  # v4
+        with:
+          name: test-reports-${{ github.run_number }}
+          path: |
+            **/target/surefire-reports/**
+            **/target/failsafe-reports/**
+          if-no-files-found: ignore
+          retention-days: 14
