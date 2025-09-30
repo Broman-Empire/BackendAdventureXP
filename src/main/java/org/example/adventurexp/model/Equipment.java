@@ -13,7 +13,7 @@ public class Equipment {
     private int totalSets, usableSets;
 
     @ManyToOne(fetch = FetchType.LAZY) // Henter kun Equipment, når den kaldes (fordi den relateres til Activity)
-    @JoinColumn(name= "activity_id", nullable = false) // Foreign key kolonne i DB
+    @JoinColumn(name= "activity_id", referencedColumnName = "id", nullable = false) // Foreign key kolonne i DB
     private Activity activity; // FK kommer fra Activity
 
 
