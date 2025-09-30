@@ -1,54 +1,44 @@
-name: Java CI (backend)
+name: Java CI (Build & Test)
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
-    branches: [ main, development, qa ]
+    branches: [ dev, qa, main ]
 
 permissions:
   contents: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  checks: write
+  pull-requests: write
 
 jobs:
-  build-and-test:
+  build-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+
+    env:
+      # Sørger for at Spring bruger test-profilen (application-test.properties)
+      SPRING_PROFILES_ACTIVE: test
+      # Gør Maven-output kortere i CI
+      MAVEN_OPTS: -Dstyle.color=always
 
     steps:
       - name: Checkout
-        uses: actions/checkout@08c69035a3f3f8e7fc83d99c4c7df8b189b9194e  # v5
-        # fetch-depth kan sættes til 0 hvis du har brug for hele historikken
-        with:
-          fetch-depth: 1
+        uses: actions/checkout@d632683dd7b4114ad389b5a9cce7b3b5f3c25d42
 
-      - name: Set up Temurin JDK 21 + Maven cache
-        uses: actions/setup-java@dded0887c1bb9db86a6b02a2d2f7fa4decb420b7  # v5
+      - name: Set up JDK 21
+        uses: actions/setup-java@99b867f3f9f6fd2f8c9b0f2a5b2e39e7f89f1bcb
         with:
           distribution: temurin
           java-version: '21'
           cache: maven
-          # Hvis dit repo er monorepo, kan du sætte en specifik POM her:
-          # cache-dependency-path: 'backend/pom.xml'
 
-      - name: Build & test (Maven wrapper hvis tilgængelig)
-        run: |
-          set -e
-          if [ -x "./mvnw" ]; then
-            ./mvnw -B -ntp clean verify
-          else
-            mvn -B -ntp clean verify
-          fi
+      - name: Build & test (Maven verify)
+        run: mvn -B -ntp -Dmaven.test.failure.ignore=false verify
 
-      - name: Upload Surefire/Failsafe reports (altid)
+      - name: Upload Surefire/Failsafe reports
         if: always()
-        uses: actions/upload-artifact@ea165f8d35bff7fa1c5a2dbac3690d2d447dded1  # v4
+        uses: actions/upload-artifact@95f4f5b5021c79d38cd6c0c29caea00d3f42330e
         with:
-          name: test-reports-${{ github.run_number }}
+          name: test-reports
           path: |
             **/target/surefire-reports/**
             **/target/failsafe-reports/**
           if-no-files-found: ignore
-          retention-days: 14
