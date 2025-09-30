@@ -15,4 +15,6 @@ public class CreateReservationDTO {
     private Long activityId;
     private LocalDateTime startsAt;
     private int participants;
+    private int groupMinAge;
+    private Long slotId;
 }
