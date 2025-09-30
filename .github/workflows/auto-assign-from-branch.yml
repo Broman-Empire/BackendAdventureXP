@@ -1,0 +1,20 @@
+name: Auto-Assign PR from Branch
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+permissions:
+  pull-requests: write
+jobs:
+  assign:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assign PR to branch user
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          USER="${BRANCH##*-}"
+          echo "Assigning PR #$PR_NUMBER to $USER"
+          gh pr edit "$PR_NUMBER" --add-assignee "$USER" || {
+            echo "⚠️ Could not assign to $USER (must have repo access)"; exit 0; }
