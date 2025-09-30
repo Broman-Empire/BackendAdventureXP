@@ -1,4 +1,4 @@
-package org.example.adventurexp.Repository;
+package org.example.adventurexp.repository;
 
 
 import org.example.adventurexp.model.ReservationItem;
