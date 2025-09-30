@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface ReservationItemRepository extends JpaRepository<ReservationItem, Long> {
+public interface IReservationItemRepository extends JpaRepository<ReservationItem, Long> {
     //Find by reservationID
     List<ReservationItem> findByReservationId(Long reservationId);
 
