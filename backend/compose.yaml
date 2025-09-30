@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      # SPRING_PROFILES_ACTIVE: Hvis man vil have flere miljøer = prod, dev, docker
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+
+  mysql:
+    image: mysql:latest
+    container_name: adventurexp-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: adventurexp
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+    volumes:
+      - mysql_data:/var/lib/mysql
+  # Ingen port her, db er kun tilgængelig i Docker-miljø
+
+volumes:
+  mysql_data:
+
+
+
