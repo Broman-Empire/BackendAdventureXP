@@ -1,4 +1,4 @@
-package org.example.adventurexp;
+package org.example.adventurexp.model;
 
 import jakarta.persistence.*;
 
@@ -14,7 +14,7 @@ public class ReservationItem {
 
     // Relation til Reservation
     @ManyToOne(fetch = FetchType.LAZY) // ReservationItem afhænger af Reservation, og hentes kun hvis den kaldes i koden
-    @JoinColumn(name = "reservation_id", nullable = false)
+    @JoinColumn(name = "reservation_id", referencedColumnName = "id", nullable = false)
     private Reservation reservation;
 
     // Relation til Activity
