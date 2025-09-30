@@ -32,6 +32,5 @@ build/
 ### VS Code ###
 .vscode/
 
-.envbackend/
-frontend/
+
 .DS_Store
