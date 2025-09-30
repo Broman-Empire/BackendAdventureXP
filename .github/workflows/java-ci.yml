@@ -14,17 +14,15 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # Sørger for at Spring bruger test-profilen (application-test.properties)
       SPRING_PROFILES_ACTIVE: test
-      # Gør Maven-output kortere i CI
       MAVEN_OPTS: -Dstyle.color=always
 
     steps:
       - name: Checkout
-        uses: actions/checkout@d632683dd7b4114ad389b5a9cce7b3b5f3c25d42
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Set up JDK 21
-        uses: actions/setup-java@99b867f3f9f6fd2f8c9b0f2a5b2e39e7f89f1bcb
+        uses: actions/setup-java@b36c23c0d998641eff861008f374ee103c25ac73 # v5.0.0
         with:
           distribution: temurin
           java-version: '21'
@@ -35,7 +33,7 @@ jobs:
 
       - name: Upload Surefire/Failsafe reports
         if: always()
-        uses: actions/upload-artifact@95f4f5b5021c79d38cd6c0c29caea00d3f42330e
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.4.3
         with:
           name: test-reports
           path: |
