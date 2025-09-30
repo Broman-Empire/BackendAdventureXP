@@ -1,0 +1,27 @@
+name: Validate Branch
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch name pattern
+        env: { BRANCH: ${{ github.head_ref }} }
+        run: |
+          echo "Branch: $BRANCH"
+          if [[ ! "$BRANCH" =~ ^SCRUM-[0-9]+-[A-Za-z0-9-]+$ ]]; then
+            echo " Invalid branch. Use: SCRUM-<number>-<github-username> (e.g. SCRUM-123-Gabel1998)"
+            exit 1
+          fi
+
+      - name: Extract username and validate against team
+        env: { BRANCH: ${{ github.head_ref }} }
+        run: |
+          USER="${BRANCH##*-}"
+          echo "Parsed user: $USER"
+          ALLOWED="^(Gabel1998|Mellerkaer|bixson|sobr0002|hajisan|JoakimRSWasTaken)$"
+          if [[ ! "$USER" =~ $ALLOWED ]]; then
+            echo " '$USER' is not allowed. Allowed: Gabel1998|Mellerkaer|bixson|sobr0002|hajisan|JoakimRSWasTaken"
+            exit 1
+          fi
