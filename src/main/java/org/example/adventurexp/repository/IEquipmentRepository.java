@@ -1,4 +1,4 @@
-package org.example.adventurexp.repositories;
+package org.example.adventurexp.repository;
 
 import org.example.adventurexp.model.Equipment;
 import org.springframework.data.jpa.repository.JpaRepository;
