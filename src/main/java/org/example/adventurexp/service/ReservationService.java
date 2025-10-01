@@ -1,5 +1,7 @@
 package org.example.adventurexp.service;
 
+import org.example.adventurexp.model.Activity;
+import org.example.adventurexp.model.TimeSlot; // Slet kommentar når timeSlot eksisterer som klasse
 import org.example.adventurexp.repository.ReservationItemRepository;
 import org.example.adventurexp.repository.ReservationRepository;
 import org.example.adventurexp.model.ReservationItem;
@@ -10,7 +12,7 @@ import java.util.List;
 
 public class ReservationService {
 
-    private final ReservationRepository reservationRepository;
+    private final ReservationRepository reservationRepository; // Bliver ikke brugt ind til videre?
     private final ReservationItemRepository reservationItemRepository;
 
     public ReservationService(ReservationRepository reservationRepository, ReservationItemRepository reservationItemRepository) {
@@ -61,5 +63,27 @@ public class ReservationService {
      *  Parameter: request (replace Object with CreateReservationRequest when available)
      */
 //    }
+
+
+
+    // Returnerer antallet af reserverede pladser for en aktivitet i et givent slot.
+    public int reservedCount(TimeSlot timeslot, Activity activity) {
+        if (timeslot == null || activity == null) return 0;
+        Long activityId = activity.getId();
+
+        /*
+          TODO:
+            1. Efter tjek metoden, når den endelige timeSlot.java er klar, og tilpas kaldet til getStart()/getEnd() hvis nødvendigt.
+            2. Sikr at reservationItemRepository.findByActivityIdAndTimeRange matcher den endelige datamodel og query-krav.
+            3. Overvej edge cases: Hvad skal returneres hvis der ikke findes nogen ReservationItems, eller hvis parametre er null?
+            4. Tilføj evt. fejlhåndtering/logning, hvis der opstår fejl ved repository-kald.
+         */
+
+        // Forudsætter at timeSlot har getStart() og getEnd() metoder, som returnerer LocalDateTime. - Ellers tilpas denne metode
+        LocalDateTime start = timeslot.getStart();
+        LocalDateTime end = timeslot.getEnd();
+        List<ReservationItem> items = reservationItemRepository.findByActivityIdAndTimeRange(activityId, start, end);
+        return items != null ? items.size() : 0;
+    }
 
 }
