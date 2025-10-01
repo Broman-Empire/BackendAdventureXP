@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-// Har relation til Reservation og Activity
+// ------ En konkret booking af et slot for x antal deltagere ------
+
+// Har relation til Reservation og TimeSlot
 
 @Entity
 public class ReservationItem {
@@ -12,23 +14,24 @@ public class ReservationItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relation til Reservation
+    // Relation til Reservation = kunden
     @ManyToOne(fetch = FetchType.LAZY) // ReservationItem afhænger af Reservation, og hentes kun hvis den kaldes i koden
     @JoinColumn(name = "reservation_id", referencedColumnName = "id", nullable = false)
     private Reservation reservation;
 
-    // Relation til Activity
+    // Relation til TimeSlot = aktivitetens konkrete tid
     @ManyToOne(fetch = FetchType.LAZY) // ReservationItem afhænger af Activity og hentes kun, når den kaldes
-    @JoinColumn(name = "activity_id", nullable = false)
-    private Activity activity;
+    @JoinColumn(name = "timeslot_id", nullable = false)
+    private TimeSlot timeSlot;
 
+    //Todo: Slet da den findes i TimeSlot kh Sofie
     private LocalDateTime startsAt, endsAt;
 
     private int participants;
 
-    public ReservationItem(Reservation reservation, Activity activity, LocalDateTime startsAt, LocalDateTime endsAt, int participants) {
+    public ReservationItem(Reservation reservation, TimeSlot timeSlot, LocalDateTime startsAt, LocalDateTime endsAt, int participants) {
         this.reservation = reservation;
-        this.activity = activity;
+        this.timeSlot = timeSlot;
         this.startsAt = startsAt;
         this.endsAt = endsAt;
         this.participants = participants;
@@ -47,14 +50,6 @@ public class ReservationItem {
 
     public void setReservation(Reservation reservation) {
         this.reservation = reservation;
-    }
-
-    public Activity getActivity() {
-        return activity;
-    }
-
-    public void setActivity(Activity activity) {
-        this.activity = activity;
     }
 
     public LocalDateTime getStartsAt() {
