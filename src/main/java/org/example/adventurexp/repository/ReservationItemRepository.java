@@ -13,6 +13,7 @@ public interface ReservationItemRepository extends JpaRepository<ReservationItem
     //Find by reservationID
     List<ReservationItem> findByReservationId(Long reservationId);
 
-    //Find items between two start times
-    List<ReservationItem> findByStartsAtBetween(LocalDateTime from, LocalDateTime to);
+    // Find items for en aktivitet i et tidsrum
+    List<ReservationItem> findByActivityIdAndTimeRange(Long activityId, LocalDateTime from, LocalDateTime to);
+
 }
