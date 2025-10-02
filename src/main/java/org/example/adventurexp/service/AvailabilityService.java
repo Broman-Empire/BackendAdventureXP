@@ -12,7 +12,6 @@ public class AvailabilityService {
     private final EquipmentService equipmentService;
     private final ReservationService reservationService;
 
-
     public AvailabilityService(IReservationRepository reservationRepository, EquipmentService equipmentService, ReservationService reservationService) {
         this.reservationRepository = reservationRepository;
         this.equipmentService = equipmentService;
