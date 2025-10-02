@@ -18,9 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ReservationServiceTest {
 
     @Mock
-    IReservationRepository IreservationRepository;
+    IReservationRepository reservationRepository;
     @Mock
-    IReservationItemRepository IreservationItemRepository;
+    IReservationItemRepository reservationItemRepository;
 
     private ReservationService service() {
         return new ReservationService(IreservationRepository, IreservationItemRepository);
