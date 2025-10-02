@@ -1,6 +1,7 @@
 package org.example.adventurexp.model;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,15 +25,11 @@ public class Reservation {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // TODO: Denne ville jeg slette, da Reservation svømmer alene. ReservationItem peger allerede på Activity. Kh Sofie
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name= "activity_id", nullable = false)
-    private Activity activity;
-
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Booking> items = new ArrayList<>();
+    private List<Booking> bookings = new ArrayList<>();
 
-    public Reservation() {}
+    public Reservation() {
+    }
 
     public Reservation(String customerType, String contactName, String email, String phone) {
         this.customerType = customerType;

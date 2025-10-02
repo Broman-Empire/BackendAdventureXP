@@ -11,6 +11,7 @@ import org.example.adventurexp.model.Booking;
 import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -30,17 +31,24 @@ public class ReservationService {
         this.timeSlotRepository = timeSlotRepository;
     }
 
-    public void ensureNoOverlaps(List<Booking> booking) {
-        if (booking == null || booking.isEmpty()) {
+    public void ensureNoOverlaps(List<Booking> bookings) {
+        if (bookings == null || bookings.isEmpty()) {
             return;
         }
 
-        // Slå alle timeslots op for booking
-        List<TimeSlot> timeSlots = booking.stream()
+        // Slå alle timeslots op for bookings
+        List<TimeSlot> timeSlots = bookings.stream()
                 .map(b -> timeSlotRepository.findById(b.getTimeSlot().getId())
-                        .orElseThrow(() -> new IllegalArgumentException("Invalid timeslot for booking " + b.getId())))
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid timeslot for bookings " + b.getId())))
                 .sorted(Comparator.comparing(TimeSlot::getStartsAt))
                 .toList();
+
+//        Her står det samme som de 5 ovenstående linjer.
+//        List<TimeSlot> timeSlots2 = new ArrayList<>();
+//        for (Booking b :  bookings) {
+//            timeSlots2.add(b.getTimeSlot());
+//        }
+//        timeSlots2.sort(Comparator.comparing(TimeSlot::getStartsAt));
 
         for (int i = 0; i < timeSlots.size() - 1; i++) {
             TimeSlot current = timeSlots.get(i);
