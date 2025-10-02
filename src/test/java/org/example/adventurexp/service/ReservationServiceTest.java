@@ -1,11 +1,12 @@
 package org.example.adventurexp.service;
 
-import org.example.adventurexp.model.ReservationItem;
+import org.example.adventurexp.model.Booking;
 import org.example.adventurexp.repository.IActivityRepository;
-import org.example.adventurexp.repository.IReservationItemRepository;
+import org.example.adventurexp.repository.IBookingRepository;
 import org.example.adventurexp.repository.IReservationRepository;
-xp.repository.IReservationRepository;
 
+
+import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -23,19 +24,21 @@ public class ReservationServiceTest {
     @Mock
     IReservationRepository reservationRepository;
     @Mock
-    IReservationItemRepository reservationItemRepository;
+    IBookingRepository reservationItemRepository;
     @Mock
     IActivityRepository activityRepository;
+    @Mock
+    ITimeSlotRepository timeSlotRepository;
 
 
     private ReservationService service() {
-        return new ReservationService(reservationRepository, reservationItemRepository, activityRepository);
+        return new ReservationService(reservationRepository, reservationItemRepository, activityRepository, timeSlotRepository);
     }
 
-    private ReservationItem item(String startsAt, String endsAt) {
-        ReservationItem item = new ReservationItem();
-        item.setStartsAt(LocalDateTime.parse(startsAt));
-        item.setEndsAt(LocalDateTime.parse(endsAt));
+    private Booking item(String startsAt, String endsAt) {
+        Booking item = new Booking();
+        item.getTimeSlot().setStartsAt(LocalDateTime.parse(startsAt));
+        item.getTimeSlot().setEndsAt(LocalDateTime.parse(endsAt));
         return item;
     }
 

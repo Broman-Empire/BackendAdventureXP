@@ -17,25 +17,19 @@ public class Activity {
     private int minParticipants;
     private int maxParticipants;
     private int durationMinutes;
-    private int parallelUnits;
-
-    // TODO: slet, da vi risikerer inkonsistens. Equipment-entiteten har allerede en relation til Activity.
-    // TODO: vi henter en Activity's Equipment fra databasen vha. findByActivityId() i EquipmentRepository interfacet
-    // @Column(name = "equipment_ref") eller er det @Column(name = "equipmentRef")?
-    private String equipmentRef;
+    private int parallelCourts;
 
     public Activity() {
     }
 
-    public Activity(Long id, String name, int minAge, int minParticipants, int maxParticipants, int durationMinutes, int parallelUnits, String equipmentRef) {
+    public Activity(Long id, String name, int minAge, int minParticipants, int maxParticipants, int durationMinutes, int parallelCourts) {
         this.id = id;
         this.name = name;
         this.minAge = minAge;
         this.minParticipants = minParticipants;
         this.maxParticipants = maxParticipants;
         this.durationMinutes = durationMinutes;
-        this.parallelUnits = parallelUnits;
-        this.equipmentRef = equipmentRef;
+        this.parallelCourts = parallelCourts;
     }
 
     public Long getId() {
@@ -86,19 +80,12 @@ public class Activity {
         this.durationMinutes = durationMinutes;
     }
 
-    public int getParallelUnits() {
-        return parallelUnits;
+    public int getParallelCourts() {
+        return parallelCourts;
     }
 
-    public void setParallelUnits(int parallelUnits) {
-        this.parallelUnits = parallelUnits;
+    public void setParallelCourts(int parallelUnits) {
+        this.parallelCourts = parallelUnits;
     }
 
-    public String getEquipmentRef() {
-        return equipmentRef;
-    }
-
-    public void setEquipmentRef(String equipmentRef) {
-        this.equipmentRef = equipmentRef;
-    }
 }

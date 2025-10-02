@@ -2,14 +2,12 @@ package org.example.adventurexp.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
-
 // ------ En konkret booking af et slot for x antal deltagere ------
 
 // Har relation til Reservation og TimeSlot
 
 @Entity
-public class ReservationItem {
+public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,24 +18,44 @@ public class ReservationItem {
     private Reservation reservation;
 
     // Relation til TimeSlot = aktivitetens konkrete tid
-    @ManyToOne(fetch = FetchType.LAZY) // ReservationItem afhænger af Activity og hentes kun, når den kaldes
+    @ManyToOne(fetch = FetchType.LAZY) // ReservationItem afhænger af TimeSlot og hentes kun, når den kaldes
     @JoinColumn(name = "timeslot_id", nullable = false)
     private TimeSlot timeSlot;
 
-    //Todo: Slet da den findes i TimeSlot kh Sofie
-    private LocalDateTime startsAt, endsAt;
+    //Relation til Activity
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "activity_id", nullable = false) // Vi har ikke referencedColumnName, da den leder efter "id"
+    Activity activity;                                  // by default. Hed vores PK noget andet, ville vi bruge det.
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public TimeSlot getTimeSlot() {
+        return timeSlot;
+    }
+
+    public void setTimeSlot(TimeSlot timeSlot) {
+        this.timeSlot = timeSlot;
+    }
+
+    public Activity getActivity() {
+        return activity;
+    }
+
+    public void setActivity(Activity activity) {
+        this.activity = activity;
+    }
 
     private int participants;
 
-    public ReservationItem(Reservation reservation, TimeSlot timeSlot, LocalDateTime startsAt, LocalDateTime endsAt, int participants) {
+    public Booking(Reservation reservation, TimeSlot timeSlot, int participants) {
         this.reservation = reservation;
         this.timeSlot = timeSlot;
-        this.startsAt = startsAt;
-        this.endsAt = endsAt;
         this.participants = participants;
     }
 
-    public ReservationItem() {
+    public Booking() {
     }
 
     public Long getId() {
@@ -50,22 +68,6 @@ public class ReservationItem {
 
     public void setReservation(Reservation reservation) {
         this.reservation = reservation;
-    }
-
-    public LocalDateTime getStartsAt() {
-        return startsAt;
-    }
-
-    public void setStartsAt(LocalDateTime startsAt) {
-        this.startsAt = startsAt;
-    }
-
-    public LocalDateTime getEndsAt() {
-        return endsAt;
-    }
-
-    public void setEndsAt(LocalDateTime endsAt) {
-        this.endsAt = endsAt;
     }
 
     public int getParticipants() {
