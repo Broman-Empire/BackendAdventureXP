@@ -3,7 +3,7 @@ package org.example.adventurexp.service;
 import org.example.adventurexp.dto.CreateReservationDTO;
 import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.repository.IActivityRepository;
-import org.example.adventurexp.repository.IReservationItemRepository;
+import org.example.adventurexp.repository.IBooking;
 import org.example.adventurexp.repository.IReservationRepository;
 
 import org.example.adventurexp.model.ReservationItem;
@@ -17,10 +17,10 @@ import java.util.List;
 public class ReservationServiceImpl implements IReservationService {
 
     private final IReservationRepository reservationRepository;
-    private final IReservationItemRepository reservationItemRepository;
+    private final IBooking reservationItemRepository;
     private final IActivityRepository activityRepository;
 
-    public ReservationServiceImpl(IReservationRepository reservationRepository, IReservationItemRepository reservationItemRepository, IActivityRepository activityRepository) {
+    public ReservationServiceImpl(IReservationRepository reservationRepository, IBooking reservationItemRepository, IActivityRepository activityRepository) {
 
         this.reservationRepository = reservationRepository;
         this.reservationItemRepository = reservationItemRepository;
