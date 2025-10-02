@@ -16,9 +16,9 @@ import java.util.List;
 @Service
 public class ReservationService {
 
-    private final ReservationRepository reservationRepository;
-    private final ReservationItemRepository reservationItemRepository;
-    private final ActivityRepository activityRepository;
+    private final IReservationRepository reservationRepository;
+    private final IReservationItemRepository reservationItemRepository;
+    private final IActivityRepository activityRepository;
 
     public ReservationService(ReservationRepository reservationRepository, ReservationItemRepository reservationItemRepository, ActivityRepository activityRepository) {
 
