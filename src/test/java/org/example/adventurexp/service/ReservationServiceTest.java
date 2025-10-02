@@ -1,8 +1,8 @@
 package org.example.adventurexp.service;
 
 import org.example.adventurexp.model.ReservationItem;
-import org.example.adventurexp.repository.ReservationItemRepository;
-import org.example.adventurexp.repository.ReservationRepository;
+import org.example.adventurexp.repository.IReservationItemRepository;
+import org.example.adventurexp.repository.IReservationRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -18,9 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ReservationServiceTest {
 
     @Mock
-    ReservationRepository reservationRepository;
+    IReservationRepository reservationRepository;
     @Mock
-    ReservationItemRepository reservationItemRepository;
+    IReservationItemRepository reservationItemRepository;
 
     private ReservationService service() {
         return new ReservationService(reservationRepository, reservationItemRepository);
