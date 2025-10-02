@@ -2,18 +2,18 @@ package org.example.adventurexp.service;
 
 import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.model.TimeSlot; // manglende model klasse
-import org.example.adventurexp.repository.ReservationRepository;
+import org.example.adventurexp.repository.IReservationRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AvailabilityService {
 
-    private final ReservationRepository reservationRepository;
+    private final IReservationRepository reservationRepository;
     private final EquipmentService equipmentService;
     private final ReservationService reservationService;
 
 
-    public AvailabilityService(ReservationRepository reservationRepository, EquipmentService equipmentService, ReservationService reservationService) {
+    public AvailabilityService(IReservationRepository reservationRepository, EquipmentService equipmentService, ReservationService reservationService) {
         this.reservationRepository = reservationRepository;
         this.equipmentService = equipmentService;
         this.reservationService = reservationService;
