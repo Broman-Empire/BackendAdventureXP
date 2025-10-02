@@ -23,7 +23,7 @@ public class ReservationServiceTest {
     IReservationItemRepository reservationItemRepository;
 
     private ReservationService service() {
-        return new ReservationService(IreservationRepository, IreservationItemRepository);
+        return new ReservationService(reservationRepository, reservationItemRepository);
     }
 
     private ReservationItem item(String startsAt, String endsAt) {
