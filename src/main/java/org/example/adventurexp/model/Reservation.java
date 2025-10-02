@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-import java.util.List;
-
+// ------ En kundes samlede booking (kontaktinfo osv.) ------
 
 @Entity
 public class Reservation {
@@ -25,6 +24,7 @@ public class Reservation {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    // TODO: Denne ville jeg slette, da Reservation svømmer alene. ReservationItem peger allerede på Activity. Kh Sofie
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "activity_id", nullable = false)
     private Activity activity;
@@ -34,12 +34,12 @@ public class Reservation {
 
     public Reservation() {}
 
-    public Reservation(String customerType, String contactName, String email, String phone, LocalDateTime createdAt) {
+    public Reservation(String customerType, String contactName, String email, String phone) {
         this.customerType = customerType;
         this.contactName = contactName;
         this.email = email;
         this.phone = phone;
-        this.createdAt = createdAt;
+        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() {

@@ -19,6 +19,8 @@ public class Activity {
     private int durationMinutes;
     private int parallelUnits;
 
+    // TODO: slet, da vi risikerer inkonsistens. Equipment-entiteten har allerede en relation til Activity.
+    // TODO: vi henter en Activity's Equipment fra databasen vha. findByActivityId() i EquipmentRepository interfacet
     // @Column(name = "equipment_ref") eller er det @Column(name = "equipmentRef")?
     private String equipmentRef;
 
