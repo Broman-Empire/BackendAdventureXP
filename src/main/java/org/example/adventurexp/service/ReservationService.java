@@ -2,14 +2,15 @@ package org.example.adventurexp.service;
 
 import org.example.adventurexp.dto.CreateReservationDTO;
 import org.example.adventurexp.model.Activity;
+import org.example.adventurexp.model.TimeSlot;
 import org.example.adventurexp.repository.IActivityRepository;
-import org.example.adventurexp.repository.IReservationItemRepository;
+import org.example.adventurexp.repository.IBookingRepository;
 import org.example.adventurexp.repository.IReservationRepository;
 
 import org.example.adventurexp.model.Booking;
+import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -17,14 +18,47 @@ import java.util.List;
 public class ReservationService {
 
     private final IReservationRepository reservationRepository;
-    private final IReservationItemRepository reservationItemRepository;
+    private final IBookingRepository bookingRepository;
     private final IActivityRepository activityRepository;
+    private final ITimeSlotRepository timeSlotRepository;
 
-    public ReservationService(IReservationRepository reservationRepository, IReservationItemRepository reservationItemRepository, IActivityRepository activityRepository) {
+    public ReservationService(IReservationRepository reservationRepository, IBookingRepository bookingRepository, IActivityRepository activityRepository, ITimeSlotRepository timeSlotRepository) {
 
         this.reservationRepository = reservationRepository;
-        this.reservationItemRepository = reservationItemRepository;
+        this.bookingRepository = bookingRepository;
         this.activityRepository = activityRepository;
+        this.timeSlotRepository = timeSlotRepository;
+    }
+
+    public void ensureNoOverlaps(List<Booking> booking) {
+        if (booking == null || booking.isEmpty()) {
+            return;
+        }
+
+        // Slå alle timeslots op for booking
+        List<TimeSlot> timeSlots = booking.stream()
+                .map(b -> timeSlotRepository.findById(b.getTimeSlot().getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid timeslot for booking " + b.getId())))
+                .sorted(Comparator.comparing(TimeSlot::getStartsAt))
+                .toList();
+
+        for (int i = 0; i < timeSlots.size() - 1; i++) {
+            TimeSlot current = timeSlots.get(i);
+            TimeSlot next = timeSlots.get(i + 1);
+
+            if (current.getEndsAt().isAfter(next.getStartsAt())) {
+                throw new IllegalArgumentException(
+                        String.format("Overlap detected: slot %d [%s - %s] overlaps with slot %d [%s - %s]",
+                                current.getId(),
+                                current.getStartsAt(),
+                                current.getEndsAt(),
+                                next.getId(),
+                                next.getStartsAt(),
+                                next.getEndsAt()
+                        )
+                );
+            }
+        }
     }
 
 //    TODO Vi må lige tage stilling til dette, når vi kommer til det.

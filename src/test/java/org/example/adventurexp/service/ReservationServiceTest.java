@@ -2,7 +2,7 @@ package org.example.adventurexp.service;
 
 import org.example.adventurexp.model.Booking;
 import org.example.adventurexp.repository.IActivityRepository;
-import org.example.adventurexp.repository.IReservationItemRepository;
+import org.example.adventurexp.repository.IBookingRepository;
 import org.example.adventurexp.repository.IReservationRepository;
 xp.repository.IReservationRepository;
 
@@ -23,7 +23,7 @@ public class ReservationServiceTest {
     @Mock
     IReservationRepository reservationRepository;
     @Mock
-    IReservationItemRepository reservationItemRepository;
+    IBookingRepository reservationItemRepository;
     @Mock
     IActivityRepository activityRepository;
 
