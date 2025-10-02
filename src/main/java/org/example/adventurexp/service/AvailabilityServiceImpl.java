@@ -15,11 +15,7 @@ public class AvailabilityServiceImpl implements IAvailabilityService {
     private final IEquipmentService equipmentService;
     private final IReservationService reservationService;
 
-    public AvailabilityServiceImpl(
-            ITimeSlotRepository timeSlotRepository,
-            IEquipmentService equipmentService,
-            IReservationService reservationService
-    ) {
+    public AvailabilityServiceImpl(ITimeSlotRepository timeSlotRepository, IEquipmentService equipmentService, IReservationService reservationService) {
         this.timeSlotRepository = timeSlotRepository;
         this.equipmentService = equipmentService;
         this.reservationService = reservationService;
