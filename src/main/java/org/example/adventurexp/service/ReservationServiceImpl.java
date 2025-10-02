@@ -14,13 +14,13 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class ReservationService {
+public class ReservationServiceImpl implements IReservationService {
 
     private final IReservationRepository reservationRepository;
     private final IReservationItemRepository reservationItemRepository;
     private final IActivityRepository activityRepository;
 
-    public ReservationService(ReservationRepository reservationRepository, ReservationItemRepository reservationItemRepository, ActivityRepository activityRepository) {
+    public ReservationServiceImpl(IReservationRepository reservationRepository, IReservationItemRepository reservationItemRepository, IActivityRepository activityRepository) {
 
         this.reservationRepository = reservationRepository;
         this.reservationItemRepository = reservationItemRepository;
@@ -107,4 +107,5 @@ public class ReservationService {
 //            throw new IllegalArgumentException("Participants exceed usable equipment available");
 //        }
     }
+
 }

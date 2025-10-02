@@ -4,7 +4,6 @@ import org.example.adventurexp.model.ReservationItem;
 import org.example.adventurexp.repository.IActivityRepository;
 import org.example.adventurexp.repository.IReservationItemRepository;
 import org.example.adventurexp.repository.IReservationRepository;
-xp.repository.IReservationRepository;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-public class ReservationServiceTest {
+public class ReservationServiceImplTest {
 
     @Mock
     IReservationRepository reservationRepository;
@@ -28,8 +27,8 @@ public class ReservationServiceTest {
     IActivityRepository activityRepository;
 
 
-    private ReservationService service() {
-        return new ReservationService(reservationRepository, reservationItemRepository, activityRepository);
+    private ReservationServiceImpl service() {
+        return new ReservationServiceImpl(reservationRepository, reservationItemRepository, activityRepository);
     }
 
     private ReservationItem item(String startsAt, String endsAt) {
