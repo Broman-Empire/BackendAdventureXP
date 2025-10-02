@@ -2,15 +2,18 @@ package org.example.adventurexp.service;
 
 import org.example.adventurexp.dto.CreateReservationDTO;
 import org.example.adventurexp.model.Activity;
-import org.example.adventurexp.repository.ActivityRepository;
-import org.example.adventurexp.repository.ReservationItemRepository;
-import org.example.adventurexp.repository.ReservationRepository;
+import org.example.adventurexp.repository.IActivityRepository;
+import org.example.adventurexp.repository.IReservationItemRepository;
+import org.example.adventurexp.repository.IReservationRepository;
+
 import org.example.adventurexp.model.ReservationItem;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
+@Service
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -18,6 +21,7 @@ public class ReservationService {
     private final ActivityRepository activityRepository;
 
     public ReservationService(ReservationRepository reservationRepository, ReservationItemRepository reservationItemRepository, ActivityRepository activityRepository) {
+
         this.reservationRepository = reservationRepository;
         this.reservationItemRepository = reservationItemRepository;
         this.activityRepository = activityRepository;
