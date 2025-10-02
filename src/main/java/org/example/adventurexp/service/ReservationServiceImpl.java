@@ -16,14 +16,14 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class ReservationService {
+public class ReservationServiceImpl implements IReservationService {
 
     private final IReservationRepository reservationRepository;
     private final IBookingRepository bookingRepository;
     private final IActivityRepository activityRepository;
     private final ITimeSlotRepository timeSlotRepository;
 
-    public ReservationService(IReservationRepository reservationRepository, IBookingRepository bookingRepository, IActivityRepository activityRepository, ITimeSlotRepository timeSlotRepository) {
+    public ReservationServiceImpl(IReservationRepository reservationRepository, IBookingRepository bookingRepository, IActivityRepository activityRepository, ITimeSlotRepository timeSlotRepository) {
 
         this.reservationRepository = reservationRepository;
         this.bookingRepository = bookingRepository;

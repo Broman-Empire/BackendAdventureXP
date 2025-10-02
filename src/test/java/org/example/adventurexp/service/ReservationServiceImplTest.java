@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-public class ReservationServiceTest {
+public class ReservationServiceImplTest {
 
     @Mock
     IReservationRepository reservationRepository;
@@ -31,8 +31,8 @@ public class ReservationServiceTest {
     ITimeSlotRepository timeSlotRepository;
 
 
-    private ReservationService service() {
-        return new ReservationService(reservationRepository, reservationItemRepository, activityRepository, timeSlotRepository);
+    private ReservationServiceImplTest service() {
+        return new ReservationServiceImpl(reservationRepository, reservationItemRepository, activityRepository, timeSlotRepository);
     }
 
     private Booking item(String startsAt, String endsAt) {

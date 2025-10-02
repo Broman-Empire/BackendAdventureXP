@@ -1,19 +1,48 @@
 package org.example.adventurexp.service;
 
 import org.example.adventurexp.dto.AvailabilityDTO;
+import org.example.adventurexp.model.Activity;
+import org.example.adventurexp.model.TimeSlot;
+import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 
 @Service
-public class AvailabilityServiceImpl implements AvailabilityService {
+public class AvailabilityServiceImpl implements IAvailabilityService {
+
+    private final ITimeSlotRepository timeSlotRepository;
+    private final IEquipmentService equipmentService;
+    private final IReservationService reservationService;
+
+    public AvailabilityServiceImpl(ITimeSlotRepository timeSlotRepository, IEquipmentService equipmentService, IReservationService reservationService) {
+        this.timeSlotRepository = timeSlotRepository;
+        this.equipmentService = equipmentService;
+        this.reservationService = reservationService;
+    }
+
+    // Calculates remaining slots for an activity in a given timeslot
 
     @Override
     public AvailabilityDTO[] getDailyAvailability(long activityId, LocalDate date) {
-        if (date == null) throw new IllegalArgumentException("du skal angive en dato");
-        // returnere et tomt array for nu
+        if (date == null) throw new IllegalArgumentException("Date must be provided");
+        // for nu giver den tomt array tilbage
         return new AvailabilityDTO[0];
     }
+
+    public int computeRemaining(TimeSlot slot, Activity activity) {
+        if (slot == null || activity == null) return 0; // Returnér 0 hvis slot eller aktivitet mangler
+
+        int usableSets = equipmentService.usableSets(activity); // Hent antal brugbare udstyrssæt
+        int reservedCount = reservationService.reservedCount(slot, activity); // Hent antal reserverede pladser
+        int slotCapacity = slot.getCapacity(); // Hent kapacitet for tidsrummet
+        int maxPossible = Math.min(slotCapacity, usableSets); // Find det maksimale antal mulige deltagere
+        int remaining = maxPossible - reservedCount; // Beregn ledige pladser
+
+        return Math.max(remaining, 0); // Returnér aldrig negativt antal
+    }
+
+
 }
     //Chattens forslag til løsning:
 
