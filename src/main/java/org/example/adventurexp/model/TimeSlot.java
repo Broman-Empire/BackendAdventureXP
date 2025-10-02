@@ -29,19 +29,27 @@ public class TimeSlot {
     @Column(nullable = false)
     private LocalDateTime endsAt;
 
-    private int unit; // Hvilken parallelUnit dette slot repræsenterer (bane 1, 2 osv)
+    private int court; // Hvilken parallelCourt dette slot repræsenterer (bane 1, 2 osv)
+
+    /**
+     * Capacity angiver hvor mange deltagere der maksimalt kan bookes i dette slot.
+     * Beregnes typisk ud fra aktivitetens maxParticipants * parallelUnits.
+     * Brugt af AvailabilityService til at beregne remaining = min(capacity, usableSets) - reservedCount.
+     */
+    private int capacity;
 
     // Reservationer knyttet til dette slot
     @OneToMany(mappedBy = "timeSlot", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReservationItem> reservations = new ArrayList<>();
 
+
     public TimeSlot() {}
 
-    public TimeSlot(Activity activity, LocalDateTime startsAt, LocalDateTime endsAt, int unit) {
+    public TimeSlot(Activity activity, LocalDateTime startsAt, LocalDateTime endsAt, int court) {
         this.activity = activity;
         this.startsAt = startsAt;
         this.endsAt = endsAt;
-        this.unit = unit;
+        this.court = court;
     }
 
 
@@ -77,12 +85,12 @@ public class TimeSlot {
         this.endsAt = endsAt;
     }
 
-    public int getUnit() {
-        return unit;
+    public int getCourt() {
+        return court;
     }
 
-    public void setUnit(int unit) {
-        this.unit = unit;
+    public void setCourt(int court) {
+        this.court = court;
     }
 
     public List<ReservationItem> getReservations() {

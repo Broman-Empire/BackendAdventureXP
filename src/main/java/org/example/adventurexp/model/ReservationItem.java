@@ -20,9 +20,13 @@ public class ReservationItem {
     private Reservation reservation;
 
     // Relation til TimeSlot = aktivitetens konkrete tid
-    @ManyToOne(fetch = FetchType.LAZY) // ReservationItem afhænger af Activity og hentes kun, når den kaldes
+    @ManyToOne(fetch = FetchType.LAZY) // ReservationItem afhænger af TimeSlot og hentes kun, når den kaldes
     @JoinColumn(name = "timeslot_id", nullable = false)
     private TimeSlot timeSlot;
+
+    //Relation til Activity
+    @ManyToOne
+    @JoinColumn
 
     //Todo: Slet da den findes i TimeSlot kh Sofie
     private LocalDateTime startsAt, endsAt;
