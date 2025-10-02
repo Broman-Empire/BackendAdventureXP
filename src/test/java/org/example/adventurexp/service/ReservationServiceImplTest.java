@@ -31,7 +31,7 @@ public class ReservationServiceImplTest {
     ITimeSlotRepository timeSlotRepository;
 
 
-    private ReservationServiceImplTest service() {
+    private ReservationServiceImpl service() {
         return new ReservationServiceImpl(reservationRepository, reservationItemRepository, activityRepository, timeSlotRepository);
     }
 
