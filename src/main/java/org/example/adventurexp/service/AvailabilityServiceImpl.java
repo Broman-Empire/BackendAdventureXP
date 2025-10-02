@@ -22,5 +22,3 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     // TODO: Map hvert slot til AvailabilityDTO (start, end, capacity, remaining, soldOut)
     // TODO: Filtrér slots hvor remaining <= 0 (hide optagede)
     // TODO: Returnér som AvailabilityDTO[]
-
-}
