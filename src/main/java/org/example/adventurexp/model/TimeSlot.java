@@ -43,6 +43,7 @@ public class TimeSlot {
     private List<ReservationItem> reservations = new ArrayList<>();
 
 
+
     public TimeSlot() {}
 
     public TimeSlot(Activity activity, LocalDateTime startsAt, LocalDateTime endsAt, int court) {

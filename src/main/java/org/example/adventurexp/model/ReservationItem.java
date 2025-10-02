@@ -24,9 +24,9 @@ public class ReservationItem {
     @JoinColumn(name = "timeslot_id", nullable = false)
     private TimeSlot timeSlot;
 
-    //Relation til Activity
-    @ManyToOne
-    @JoinColumn
+//    //Relation til Activity
+//    @ManyToOne
+//    @JoinColumn
 
     //Todo: Slet da den findes i TimeSlot kh Sofie
     private LocalDateTime startsAt, endsAt;
