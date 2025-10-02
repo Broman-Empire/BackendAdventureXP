@@ -3,11 +3,13 @@ package org.example.adventurexp.service;
 import org.example.adventurexp.repository.IReservationItemRepository;
 import org.example.adventurexp.repository.IReservationRepository;
 import org.example.adventurexp.model.ReservationItem;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
+@Service
 public class ReservationService {
 
     private final IReservationRepository reservationRepository;
