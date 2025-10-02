@@ -6,7 +6,7 @@ import org.example.adventurexp.repository.IActivityRepository;
 import org.example.adventurexp.repository.IReservationItemRepository;
 import org.example.adventurexp.repository.IReservationRepository;
 
-import org.example.adventurexp.model.ReservationItem;
+import org.example.adventurexp.model.Booking;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,10 +27,10 @@ public class ReservationService {
         this.activityRepository = activityRepository;
     }
 
-    public void ensureNoOverlaps(List<ReservationItem> items) {
+    public void ensureNoOverlaps(List<Booking> items) {
         if(items == null || items.isEmpty()) return;
 
-        for (ReservationItem item : items) {
+        for (Booking item : items) {
             if(item == null) continue;
             LocalDateTime start = item.getStartsAt();
             LocalDateTime end = item.getEndsAt();
@@ -42,15 +42,15 @@ public class ReservationService {
             }
         }
 
-        List<ReservationItem> sorted = items.stream()
+        List<Booking> sorted = items.stream()
                 .filter(i -> i != null) // we filter null values out
                 .sorted(Comparator
-                        .comparing(ReservationItem::getStartsAt) // we sort by start time
-                        .thenComparing(ReservationItem::getEndsAt)) // if start time is same, sort by end time
+                        .comparing(Booking::getStartsAt) // we sort by start time
+                        .thenComparing(Booking::getEndsAt)) // if start time is same, sort by end time
                 .toList();
 
         LocalDateTime lastEnd = null;
-        for (ReservationItem item : sorted) {
+        for (Booking item : sorted) {
             if (lastEnd != null && item.getStartsAt().isBefore(lastEnd)) { // if current start is before last end
                 throw new IllegalArgumentException("Overlapping reservation items detected");
             }

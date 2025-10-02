@@ -40,7 +40,7 @@ public class TimeSlot {
 
     // Reservationer knyttet til dette slot
     @OneToMany(mappedBy = "timeSlot", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReservationItem> reservations = new ArrayList<>();
+    private List<Booking> reservations = new ArrayList<>();
 
 
 
@@ -94,11 +94,11 @@ public class TimeSlot {
         this.court = court;
     }
 
-    public List<ReservationItem> getReservations() {
+    public List<Booking> getReservations() {
         return reservations;
     }
 
-    public void setReservations(List<ReservationItem> reservations) {
+    public void setReservations(List<Booking> reservations) {
         this.reservations = reservations;
     }
 

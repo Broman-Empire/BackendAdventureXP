@@ -30,7 +30,7 @@ public class Reservation {
     private Activity activity;
 
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReservationItem> items = new ArrayList<>();
+    private List<Booking> items = new ArrayList<>();
 
     public Reservation() {}
 

@@ -1,6 +1,6 @@
 package org.example.adventurexp.service;
 
-import org.example.adventurexp.model.ReservationItem;
+import org.example.adventurexp.model.Booking;
 import org.example.adventurexp.repository.IActivityRepository;
 import org.example.adventurexp.repository.IReservationItemRepository;
 import org.example.adventurexp.repository.IReservationRepository;
@@ -32,8 +32,8 @@ public class ReservationServiceTest {
         return new ReservationService(reservationRepository, reservationItemRepository, activityRepository);
     }
 
-    private ReservationItem item(String startsAt, String endsAt) {
-        ReservationItem item = new ReservationItem();
+    private Booking item(String startsAt, String endsAt) {
+        Booking item = new Booking();
         item.setStartsAt(LocalDateTime.parse(startsAt));
         item.setEndsAt(LocalDateTime.parse(endsAt));
         return item;
