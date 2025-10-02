@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ActivityService implements IActivityService {
 
-    org.example.adventurexp.repository.IActivityRepository activityRepository;
+    IActivityRepository activityRepository;
 
     public ActivityService(IActivityRepository activityRepository) {
         this.activityRepository = activityRepository;
@@ -15,6 +15,6 @@ public class ActivityService implements IActivityService {
 
     @Override
     public Activity createActivity(Activity activity) {
-        return null;
+        return activityRepository.save(activity);
     }
 }
