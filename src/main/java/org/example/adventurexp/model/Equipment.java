@@ -58,6 +58,7 @@ public class Equipment {
     public void setUsableSets(int usableSets) {
         this.usableSets = usableSets;
     }
+
     public Activity getActivity() {
         return activity;
     }
@@ -65,7 +66,6 @@ public class Equipment {
     public void setActivity(Activity activity) {
         this.activity = activity;
     }
-
 
 
 }
