@@ -20,43 +20,44 @@ public class ReservationService {
     private final IReservationItemRepository reservationItemRepository;
     private final IActivityRepository activityRepository;
 
-    public ReservationService(ReservationRepository reservationRepository, ReservationItemRepository reservationItemRepository, ActivityRepository activityRepository) {
+    public ReservationService(IReservationRepository reservationRepository, IReservationItemRepository reservationItemRepository, IActivityRepository activityRepository) {
 
         this.reservationRepository = reservationRepository;
         this.reservationItemRepository = reservationItemRepository;
         this.activityRepository = activityRepository;
     }
 
-    public void ensureNoOverlaps(List<Booking> items) {
-        if(items == null || items.isEmpty()) return;
-
-        for (Booking item : items) {
-            if(item == null) continue;
-            LocalDateTime start = item.getStartsAt();
-            LocalDateTime end = item.getEndsAt();
-            if(start == null || end == null) {
-                throw new IllegalArgumentException("ReservationItem has null start or end time");
-            }
-            if(!end.isAfter(start)) {
-                throw new IllegalArgumentException("ReservationItem end time must be after start time");
-            }
-        }
-
-        List<Booking> sorted = items.stream()
-                .filter(i -> i != null) // we filter null values out
-                .sorted(Comparator
-                        .comparing(Booking::getStartsAt) // we sort by start time
-                        .thenComparing(Booking::getEndsAt)) // if start time is same, sort by end time
-                .toList();
-
-        LocalDateTime lastEnd = null;
-        for (Booking item : sorted) {
-            if (lastEnd != null && item.getStartsAt().isBefore(lastEnd)) { // if current start is before last end
-                throw new IllegalArgumentException("Overlapping reservation items detected");
-            }
-            lastEnd = item.getEndsAt(); // update lastEnd to current activity end
-        }
-    }
+//    TODO Vi må lige tage stilling til dette, når vi kommer til det.
+//    public void ensureNoOverlaps(List<Booking> bookings) {
+//        if(bookings == null || bookings.isEmpty()) return;
+//
+//        for (Booking booking : bookings) {
+//            if(booking == null) continue;
+//            LocalDateTime start = booking.getTimeSlot().getStartsAt();
+//            LocalDateTime end = booking.getTimeSlot().getEndsAt();
+//            if(start == null || end == null) {
+//                throw new IllegalArgumentException("ReservationItem has null start or end time");
+//            }
+//            if(!end.isAfter(start)) {
+//                throw new IllegalArgumentException("ReservationItem end time must be after start time");
+//            }
+//        }
+//
+//        List<Booking> sorted = bookings.stream()
+//                .filter(b -> b != null) // we filter null values out
+//                .sorted(Comparator
+//                        .comparing(Booking::getTimeSlot) // we sort by start time
+//                        .thenComparing(Booking::getEndsAt)) // if start time is same, sort by end time
+//                .toList();
+//
+//        LocalDateTime lastEnd = null;
+//        for (Booking booking : sorted) {
+//            if (lastEnd != null && booking.getTimeSlot().getStartsAt().isBefore(lastEnd)) { // if current start is before last end
+//                throw new IllegalArgumentException("Overlapping reservation bookings detected");
+//            }
+//            lastEnd = booking.getTimeSlot().getEndsAt(); // update lastEnd to current activity end
+//        }
+//    }
 
     public void validateReservation(Object request) {
 
