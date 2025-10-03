@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 public class ActivityService implements IActivityService {
 
-    IBookingService bookingService; // TODO Den findes ikke, men skal jo eksistere på et tidspunkt
+    //IBookingService bookingService; // TODO Den findes ikke, men skal jo eksistere på et tidspunkt
     IActivityRepository activityRepository;
 
     public ActivityService(IActivityRepository activityRepository) {
@@ -50,15 +50,16 @@ public class ActivityService implements IActivityService {
 
     @Override
     public Activity deleteActivity(Long id) {
-        Activity toBeDeleted = activityRepository.findById(id).orElseThrow();
-        for (Booking booking : bookingService.findAll()) {
-            if (booking.getActivity().getId().equals(id)) {
-                // TODO Vi skal lige finde ud af, hvad vi præcis smider, hvis aktiviteten faktisk har bookinger ved sletning
-                throw new IllegalArgumentException("Cannot delete activity with existing bookings");
-            }
-        }
-        activityRepository.delete(toBeDeleted);
-        return toBeDeleted;
+//        Activity toBeDeleted = activityRepository.findById(id).orElseThrow();
+//        for (Booking booking : bookingService.findAll()) {
+//            if (booking.getActivity().getId().equals(id)) {
+//                // TODO Vi skal lige finde ud af, hvad vi præcis smider, hvis aktiviteten faktisk har bookinger ved sletning
+//                throw new IllegalArgumentException("Cannot delete activity with existing bookings");
+//            }
+//        }
+//        activityRepository.delete(toBeDeleted);
+//        return toBeDeleted;
+        return null;
     }
 
 }

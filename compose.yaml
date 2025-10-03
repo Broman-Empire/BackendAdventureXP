@@ -22,12 +22,15 @@ services:
       MYSQL_DATABASE: adventurexp
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASS}
+
+    ports:
+      - "127.0.0.1:3307:3306"   # containerens port 3306 mappes til vores lokale 3307
     volumes:
-      - mysql_data:/var/lib/mysql
-  # Ingen port her, db er kun tilgængelig i Docker-miljø
+      - mysql_data:/var/lib/mysql # Bruger volume'et mysql_data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql #/docker-entrypoint-initdb.d/init.sql = mappe inde i containeren
 
 volumes:
-  mysql_data:
+  mysql_data: # Opretter docker-volume med navnet mysql_data
 
 
 
