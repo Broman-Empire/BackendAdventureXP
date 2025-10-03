@@ -13,21 +13,13 @@ import java.util.Optional;
 
 
 @Service
-public class SlotService implements ISlotService {
+public class SlotServiceImpl implements ISlotService {
 
-
-    // TODO Chattens forslag til, hvad man skal have med i metoden i task SCRUM-155
-    //  public void generateSlots(int activityId, String fromDate, String toDate, String openTime, String closeTime) {
-        // TODO: Hent aktivitetens varighed og parallelUnits fra databasen
-        // TODO: Loop igennem alle datoer fra fromDate til toDate
-        // TODO: Loop igennem åbningstid baseret på openTime, closeTime og aktivitetens varighed
-        // TODO: Opret Slot-objekter og gem dem i databasen (SlotRepository)
-        // TODO: Håndter eventuelle overlap og begrænsninger
 
     private final ITimeSlotRepository timeSlotRepository;
     private final IActivityRepository activityRepository;
 
-    public SlotService(ITimeSlotRepository timeSlotRepository, IActivityRepository activityRepository) {
+    public SlotServiceImpl(ITimeSlotRepository timeSlotRepository, IActivityRepository activityRepository) {
         this.timeSlotRepository = timeSlotRepository;
         this.activityRepository = activityRepository;
     }

@@ -4,7 +4,6 @@ import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.model.TimeSlot;
 import org.example.adventurexp.repository.IActivityRepository;
 import org.example.adventurexp.repository.ITimeSlotRepository;
-import org.example.adventurexp.service.SlotService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -16,17 +15,17 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-public class SlotServiceTest {
+public class SlotServiceImplTest {
 
     private IActivityRepository activityRepository;
     private ITimeSlotRepository timeSlotRepository;
-    private SlotService slotService;
+    private SlotServiceImpl slotServiceImpl;
 
     @BeforeEach
     void setUp() {
         activityRepository = mock(IActivityRepository.class);
         timeSlotRepository = mock(ITimeSlotRepository.class);
-        slotService = new SlotService(timeSlotRepository, activityRepository);
+        slotServiceImpl = new SlotServiceImpl(timeSlotRepository, activityRepository);
     }
 
     @Test
@@ -46,7 +45,7 @@ public class SlotServiceTest {
         LocalTime closeTime = LocalTime.of(14, 0);
 
         // Act
-        slotService.generateSlots(1L, fromDate, toDate, openTime, closeTime);
+        slotServiceImpl.generateSlots(1L, fromDate, toDate, openTime, closeTime);
 
         // Assert: fang alle gemte slots
         ArgumentCaptor<TimeSlot> slotCaptor = ArgumentCaptor.forClass(TimeSlot.class);
