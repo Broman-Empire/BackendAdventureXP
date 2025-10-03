@@ -1,7 +1,11 @@
 package org.example.adventurexp.service;
 
+import jakarta.transaction.Transactional;
 import org.example.adventurexp.dto.CreateReservationDTO;
+import org.example.adventurexp.dto.ReservationResponse;
+import org.example.adventurexp.dto.UpdateReservationRequest;
 import org.example.adventurexp.model.Activity;
+import org.example.adventurexp.model.Reservation;
 import org.example.adventurexp.model.TimeSlot;
 import org.example.adventurexp.repository.IActivityRepository;
 import org.example.adventurexp.repository.IBookingRepository;
@@ -11,7 +15,7 @@ import org.example.adventurexp.model.Booking;
 import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -22,13 +26,18 @@ public class ReservationServiceImpl implements IReservationService {
     private final IBookingRepository bookingRepository;
     private final IActivityRepository activityRepository;
     private final ITimeSlotRepository timeSlotRepository;
+    private final IEquipmentService equipmentService;
 
-    public ReservationServiceImpl(IReservationRepository reservationRepository, IBookingRepository bookingRepository, IActivityRepository activityRepository, ITimeSlotRepository timeSlotRepository) {
-
+    public ReservationServiceImpl(IReservationRepository reservationRepository,
+                                  IBookingRepository bookingRepository,
+                                  IActivityRepository activityRepository,
+                                  ITimeSlotRepository timeSlotRepository,
+                                  IEquipmentService equipmentService) {
         this.reservationRepository = reservationRepository;
         this.bookingRepository = bookingRepository;
         this.activityRepository = activityRepository;
         this.timeSlotRepository = timeSlotRepository;
+        this.equipmentService = equipmentService;
     }
 
     public void ensureNoOverlaps(List<Booking> bookings) {
@@ -131,19 +140,27 @@ public class ReservationServiceImpl implements IReservationService {
             throw new IllegalArgumentException("Unknown customer type: " + dto.getCustomerType());
         }
 
-        // TODO: MANGLER Slot model og repository til at fuldføre nedenstående
-//        // Slot and capacity checks
-//        if (dto.getSlotId() == null) {
-//            throw new IllegalArgumentException("slotId is required");
-//        }
-//        Slot slot = slotRepository.findById(dto.getSlotId())
-//                .orElseThrow(() -> new IllegalArgumentException("Slot not found: " + dto.getSlotId()));
-//        Integer remaining = slot.getRemaining();
-//        if (remaining == null || remaining < dto.getParticipants()) {
-//            throw new IllegalArgumentException("Not enough remaining capacity in selected slot");
-//        }
+        // Slot and capacity checks
+        if (dto.getSlotId() == null) {
+            throw new IllegalArgumentException("slotId is required");
+        }
+        TimeSlot slot = timeSlotRepository.findById(dto.getSlotId())
+                .orElseThrow(() -> new IllegalArgumentException("Slot not found: " + dto.getSlotId()));
 
-        // TODO: MANGLER equipment logik til at fuldføre nedenstående
+        Activity activity = activityRepository.findById(dto.getActivityId())
+                .orElseThrow(() -> new IllegalArgumentException("Activity not found: " + dto.getActivityId()));
+
+        // Calculate remaining capacity
+        int usableSets = equipmentService.usableSets(activity);
+        int reservedCount = reservedCount(slot, activity);
+        int maxPossible = Math.min(slot.getCapacity(), usableSets);
+        int remaining = maxPossible - reservedCount;
+
+        if (remaining < dto.getParticipants()) {
+            throw new IllegalArgumentException("Not enough remaining capacity in selected slot. Available: " + remaining + ", requested: " + dto.getParticipants());
+        }
+
+        // TODO: MANGLER equipment logik til at fuldfÃ¸re nedenstÃ¥ende
 //        // Equipment availability check
 //        Integer usableSets = dto.getUsableSets();
 //        if (usableSets != null && dto.getParticipants() > usableSets) {
@@ -158,4 +175,68 @@ public class ReservationServiceImpl implements IReservationService {
         }
         return bookingRepository.sumParticipantsByActivityAndSlot(activity.getId(), slot.getId());
     }
+
+    @Override
+    public void cancelReservation(Long reservationId) {
+
+    }
+
+
+    // Note: Reserved count tracking removed - we calculate it dynamically via reservedCount() method instead
+
+
+    @Transactional
+    @Override
+    public ReservationResponse createReservation(CreateReservationDTO request) {
+        // Step 1: Validate the reservation
+        validateReservation(request);
+
+        // Step 2: Fetch Activity and TimeSlot
+        Activity activity = activityRepository.findById(request.getActivityId())
+                .orElseThrow(() -> new IllegalArgumentException("Activity not found: " + request.getActivityId()));
+        TimeSlot slot = timeSlotRepository.findById(request.getSlotId())
+                .orElseThrow(() -> new IllegalArgumentException("TimeSlot not found: " + request.getSlotId()));
+
+        // Step 3: Create and save Reservation
+        Reservation reservation = new Reservation();
+        reservation.setCustomerType(request.getCustomerType());
+        reservation.setContactName(request.getContactName());
+        reservation.setEmail(request.getEmail());
+        reservation.setPhone(request.getPhone());
+        reservation.setCreatedAt(LocalDateTime.now());
+        reservation = reservationRepository.save(reservation);
+
+        // Step 4: Create and save Booking
+        Booking booking = new Booking();
+        booking.setReservation(reservation);
+        booking.setActivity(activity);
+        booking.setTimeSlot(slot);
+        booking.setParticipants(request.getParticipants());
+        bookingRepository.save(booking);
+
+        // Step 5: Apply capacity changes (if using reserved count tracking)
+        // addToSlotReservedCount(slot, request.getParticipants());
+
+        // Step 6: Return ReservationResponse
+        return new ReservationResponse(
+                reservation.getId(),
+                activity.getId(),
+                (long) booking.getParticipants(),
+                (long) booking.getParticipants(),
+                slot.getStartsAt()
+        );
+    }
+
+
+
+    @Override
+    public void updateReservation(UpdateReservationRequest req) {
+
+    }
+
+    @Override
+    public void deleteReservation(Long reservationId) {
+    }
+
+
 }
