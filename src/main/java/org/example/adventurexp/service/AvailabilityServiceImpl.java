@@ -9,6 +9,7 @@ import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,10 +33,11 @@ public class AvailabilityServiceImpl implements IAvailabilityService {
 
     // Calculates remaining slots for an activity in a given timeslot
     @Override
-    public AvailabilityDTO[] getDailyAvailability(long activityId, LocalDate date) {
-        if (date == null) throw new IllegalArgumentException("Date must be provided"); // Tjek for null dato
+    public AvailabilityDTO[] getDailyAvailability(long activityId, LocalDate fromDate, LocalDate toDate, LocalTime openTime, LocalTime closeTime) {
+        if (fromDate == null || toDate == null || openTime == null || closeTime == null)
+            throw new IllegalArgumentException("Date must be provided"); // Tjek for null dato
 
-        List<TimeSlot> slots = iSlotService.generateSlots(activityId, date);
+        List<TimeSlot> slots = iSlotService.generateSlots(activityId, fromDate, toDate, openTime, closeTime);
         List<AvailabilityDTO> availableSlots = new ArrayList<>();
 
         for (TimeSlot slot : slots) {
@@ -48,7 +50,7 @@ public class AvailabilityServiceImpl implements IAvailabilityService {
                     slot.getEndsAt(),   // Sluttidspunkt
                     slot.getCapacity(), // Kapacitet
                     remaining,          // Ledige pladser
-                    remaining == 0      // Udsolgt
+                    false               // Udsolgt
                 );
                 availableSlots.add(dto);
             }
