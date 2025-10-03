@@ -27,12 +27,13 @@ class ReservationServiceImplTest {
     @Mock IBookingRepository bookingRepository;
     @Mock IActivityRepository activityRepository;
     @Mock ITimeSlotRepository timeSlotRepository;
+    @Mock IEquipmentService equipmentService;
 
     private ReservationServiceImpl sut;
 
     @BeforeEach
     void setUp() {
-        sut = new ReservationServiceImpl(reservationRepository, bookingRepository, activityRepository, timeSlotRepository);
+        sut = new ReservationServiceImpl(reservationRepository, bookingRepository, activityRepository, timeSlotRepository, equipmentService);
     }
 
     /**

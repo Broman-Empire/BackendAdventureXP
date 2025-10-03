@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class AvailabilityServiceImpl {
+public class AvailabilityServiceImpl implements IAvailabilityService {
 
     private final ITimeSlotRepository iTimeSlotRepository;
     private final IEquipmentService iEquipmentService;
