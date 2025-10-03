@@ -4,6 +4,8 @@ import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.repository.IActivityRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ActivityService implements IActivityService {
 
@@ -12,9 +14,16 @@ public class ActivityService implements IActivityService {
     public ActivityService(IActivityRepository activityRepository) {
         this.activityRepository = activityRepository;
     }
+  
+  @Override
+    public List<Activity> findAll() {
+        return activityRepository.findAll();
+    }
 
     @Override
     public Activity createActivity(Activity activity) {
         return activityRepository.save(activity);
     }
+
+    
 }
