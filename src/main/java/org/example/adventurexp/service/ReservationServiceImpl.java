@@ -176,9 +176,19 @@ public class ReservationServiceImpl implements IReservationService {
         return bookingRepository.sumParticipantsByActivityAndSlot(activity.getId(), slot.getId());
     }
 
+    @Transactional
     @Override
     public void cancelReservation(Long reservationId) {
+        if (reservationId == null) {
+            throw new IllegalArgumentException("Reservation ID cannot be null");
+        }
 
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + reservationId));
+
+        // Delete reservation - cascade will handle deleting associated bookings
+        // No need to manually adjust reservedCount since we calculate it dynamically via reservedCount() method
+        reservationRepository.delete(reservation);
     }
 
 
@@ -229,9 +239,86 @@ public class ReservationServiceImpl implements IReservationService {
 
 
 
+    @Transactional
     @Override
     public void updateReservation(UpdateReservationRequest req) {
+        if (req == null || req.getReservationId() == null) {
+            throw new IllegalArgumentException("Update request and reservation ID are required");
+        }
 
+        // Fetch existing reservation
+        Reservation reservation = reservationRepository.findById(req.getReservationId())
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + req.getReservationId()));
+
+        // Update contact information if provided
+        if (req.getContactName() != null && !req.getContactName().isBlank()) {
+            reservation.setContactName(req.getContactName());
+        }
+        if (req.getEmail() != null && !req.getEmail().isBlank()) {
+            reservation.setEmail(req.getEmail());
+        }
+        if (req.getPhone() != null && !req.getPhone().isBlank()) {
+            reservation.setPhone(req.getPhone());
+        }
+
+        // Find the booking associated with this reservation (assuming one booking per reservation for now)
+        List<Booking> bookings = bookingRepository.findByReservationId(req.getReservationId());
+        if (bookings.isEmpty()) {
+            throw new IllegalArgumentException("No bookings found for reservation: " + req.getReservationId());
+        }
+
+        Booking booking = bookings.get(0); // Get first booking
+
+        // Handle activity or timeslot changes
+        boolean activityChanged = req.getActivityId() != null && !req.getActivityId().equals(booking.getActivity().getId());
+        boolean participantsChanged = req.getNewParticipants() != null && !req.getNewParticipants().equals(booking.getParticipants());
+
+        if (activityChanged || req.getNewStart() != null || participantsChanged) {
+            // Fetch new activity if changed
+            Activity newActivity = booking.getActivity();
+            if (activityChanged) {
+                newActivity = activityRepository.findById(req.getActivityId())
+                        .orElseThrow(() -> new IllegalArgumentException("Activity not found: " + req.getActivityId()));
+            }
+
+            // Find new timeslot if start time changed
+            TimeSlot newSlot = booking.getTimeSlot();
+            if (req.getNewStart() != null) {
+                // Note: This assumes you have a way to find slots by start time and activity
+                // You may need to add a query method to ITimeSlotRepository
+                throw new UnsupportedOperationException("Changing reservation start time requires additional repository method");
+                // Example: newSlot = timeSlotRepository.findByActivityIdAndStartsAt(newActivity.getId(), req.getNewStart())
+                //              .orElseThrow(() -> new IllegalArgumentException("No slot found for the requested time"));
+            }
+
+            // Validate new booking parameters
+            int newParticipantCount = req.getNewParticipants() != null ? req.getNewParticipants() : booking.getParticipants();
+
+            // Check capacity for new slot
+            int usableSets = equipmentService.usableSets(newActivity);
+            int reservedCount = reservedCount(newSlot, newActivity);
+
+            // Subtract current booking's participants if it's the same slot (to avoid counting it twice)
+            if (newSlot.getId().equals(booking.getTimeSlot().getId()) && newActivity.getId().equals(booking.getActivity().getId())) {
+                reservedCount -= booking.getParticipants();
+            }
+
+            int maxPossible = Math.min(newSlot.getCapacity(), usableSets);
+            int remaining = maxPossible - reservedCount;
+
+            if (remaining < newParticipantCount) {
+                throw new IllegalArgumentException("Not enough capacity in selected slot. Available: " + remaining + ", requested: " + newParticipantCount);
+            }
+
+            // Update booking
+            booking.setActivity(newActivity);
+            booking.setTimeSlot(newSlot);
+            booking.setParticipants(newParticipantCount);
+            bookingRepository.save(booking);
+        }
+
+        // Save updated reservation
+        reservationRepository.save(reservation);
     }
 
     @Override
