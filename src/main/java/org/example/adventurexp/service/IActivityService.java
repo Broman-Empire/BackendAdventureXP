@@ -12,4 +12,6 @@ public interface IActivityService {
 
     Activity updateActivity(Long id, Activity activity);
 
+    Activity deleteActivity(Long id);
+
 }
