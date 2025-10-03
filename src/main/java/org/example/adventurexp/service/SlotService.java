@@ -32,7 +32,7 @@ public class SlotService implements ISlotService {
         this.activityRepository = activityRepository;
     }
 
-    // Opretter tidsrum (slots) for en given aktivitet ud fra:
+    // Opretter tidsrum (slots) for en given aktivitet (hvis den oprettes/ændres) ud fra:
     // aktivitetens varighed (duration), antal baner (parallelCourts)
     // samt antal deltagere (capacity) for hvert slot inden for åbningstiden
     @Override
@@ -57,22 +57,28 @@ public class SlotService implements ISlotService {
 
             // Looper så længe, der er plads til et nyt slot
             while (slotStart.plusMinutes(durationMinutes).isBefore(dayEnd)
-                || slotStart.plusMinutes(durationMinutes).equals(dayEnd));
+                    || slotStart.plusMinutes(durationMinutes).equals(dayEnd)) {
 
-            LocalDateTime slotEnd = slotStart.plusMinutes(durationMinutes);
+                LocalDateTime slotEnd = slotStart.plusMinutes(durationMinutes);
 
-            // Opret et slot hver hver "parallelCourt"
-            for (int court = 1; court <= parallelCourts; court++) {
-                TimeSlot slot = new TimeSlot();
-                slot.setActivity(activity);
-                slot.setStartsAt(slotStart);
-                slot.setEndsAt(slotEnd);
-                slot.setCourt(court);
-                slot.setCapacity(maxParticipants);
+                // Opret et slot hver hver "parallelCourt"
+                for (int court = 1; court <= parallelCourts; court++) {
+                    TimeSlot slot = new TimeSlot();
+                    slot.setActivity(activity);
+                    slot.setStartsAt(slotStart);
+                    slot.setEndsAt(slotEnd);
+                    slot.setCourt(court);
+                    slot.setCapacity(maxParticipants); // max antal deltagere pr. slot
+
+                    timeSlotRepository.save(slot);
+                }
+                // Et slot kan starte, når et andet slot slutter
+                slotStart = slotEnd;
             }
+            // Når vi har genereret slots for én dag, genererer vi slots for den næste dag
+            currentDate = currentDate.plusDays(1);
+
         }
 
     }
-
-
 }
