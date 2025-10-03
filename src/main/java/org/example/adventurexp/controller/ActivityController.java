@@ -1,5 +1,6 @@
 package org.example.adventurexp.controller;
 
+import org.example.adventurexp.dto.ActivityDTO;
 import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.service.IActivityService;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,8 @@ public class ActivityController {
         this.activityService = activityService;
     }
 
-    public List<Activity> getAllActivities() {
+    public List<ActivityDTO> getAllActivities() {
+
         return activityService.findAll();
     }
 
