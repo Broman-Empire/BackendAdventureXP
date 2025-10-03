@@ -15,6 +15,10 @@ public interface IBookingRepository extends JpaRepository<Booking, Long> {
     //Find by reservationID
     List<Booking> findByReservationId(Long reservationId);
 
+    
+	//Find bookings for en aktivitet i et tidsinterval
+	List<Booking> findByActivityIdAndTimeSlot(Long activityId, LocalDateTime from, LocalDateTime to);
+
     //Find items between two start times
     List<Booking> findByStartsAtBetween(LocalDateTime from, LocalDateTime to);
 
