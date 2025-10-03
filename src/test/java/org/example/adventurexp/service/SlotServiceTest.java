@@ -7,57 +7,59 @@ import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.example.adventurexp.service.SlotService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-@DataJpaTest
+import static org.mockito.Mockito.*;
+
 public class SlotServiceTest {
-    @Autowired
+
     private IActivityRepository activityRepository;
-
-    @Autowired
     private ITimeSlotRepository timeSlotRepository;
-
     private SlotService slotService;
 
     @BeforeEach
     void setUp() {
+        activityRepository = mock(IActivityRepository.class);
+        timeSlotRepository = mock(ITimeSlotRepository.class);
         slotService = new SlotService(timeSlotRepository, activityRepository);
     }
 
     @Test
-    void generateSlots_createsExpectedSlots() {
-        // Arrange: opret en aktivitet
+    void generateSlots_createsExpectedNumberOfSlots() {
+        // Arrange
         Activity activity = new Activity();
-        activity.setName("Paintball");
+        activity.setId(1L);
         activity.setDurationMinutes(60);
         activity.setMaxParticipants(10);
         activity.setParallelCourts(2);
-        activityRepository.save(activity);
+
+        when(activityRepository.findById(1L)).thenReturn(Optional.of(activity));
 
         LocalDate fromDate = LocalDate.of(2025, 10, 1);
-        LocalDate toDate   = LocalDate.of(2025, 10, 1); // kun én dag
+        LocalDate toDate   = LocalDate.of(2025, 10, 1); // én dag
         LocalTime openTime  = LocalTime.of(10, 0);
         LocalTime closeTime = LocalTime.of(14, 0);
 
-        // Act: generér slots
-        slotService.generateSlots(activity.getId(), fromDate, toDate, openTime, closeTime);
+        // Act
+        slotService.generateSlots(1L, fromDate, toDate, openTime, closeTime);
 
-        // Assert: hent slots fra repo og check
-        List<TimeSlot> slots = timeSlotRepository.findByActivity(activity);
+        // Assert: fang alle gemte slots
+        ArgumentCaptor<TimeSlot> slotCaptor = ArgumentCaptor.forClass(TimeSlot.class);
+        verify(timeSlotRepository, times(8)).save(slotCaptor.capture());
 
-        // 10-14 = 4 slots á 60 min × 2 baner = 8 slots i alt
-        assertThat(slots).hasSize(8);
+        assertThat(slotCaptor.getAllValues()).hasSize(8);
 
-        // Check at første slot starter kl. 10:00
-        assertThat(slots.get(0).getStartsAt().toLocalTime()).isEqualTo(LocalTime.of(10, 0));
-        // Check at sidste slot slutter kl. 14:00
-        assertThat(slots.get(slots.size()-1).getEndsAt().toLocalTime()).isEqualTo(LocalTime.of(14, 0));
+        // Første slot starter 10:00
+        assertThat(slotCaptor.getAllValues().get(0).getStartsAt().toLocalTime())
+                .isEqualTo(LocalTime.of(10, 0));
+
+        // Sidste slot slutter 14:00
+        assertThat(slotCaptor.getAllValues().get(7).getEndsAt().toLocalTime())
+                .isEqualTo(LocalTime.of(14, 0));
     }
-
 }
