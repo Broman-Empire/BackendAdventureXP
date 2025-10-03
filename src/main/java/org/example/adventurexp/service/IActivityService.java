@@ -6,8 +6,10 @@ import java.util.List;
 
 public interface IActivityService {
 
-  List<Activity> findAll();
+    List<Activity> findAll();  
   
-  Activity createActivity(Activity activity);
+    Activity createActivity(Activity activity);
+
+    Activity updateActivity(Long id, Activity activity);
 
 }
