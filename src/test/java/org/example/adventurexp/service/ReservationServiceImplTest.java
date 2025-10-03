@@ -1,6 +1,7 @@
 package org.example.adventurexp.service;
 
 import org.example.adventurexp.model.Booking;
+import org.example.adventurexp.model.TimeSlot;
 import org.example.adventurexp.repository.IActivityRepository;
 import org.example.adventurexp.repository.IBookingRepository;
 import org.example.adventurexp.repository.IReservationRepository;
@@ -35,12 +36,23 @@ public class ReservationServiceImplTest {
         return new ReservationServiceImpl(reservationRepository, reservationItemRepository, activityRepository, timeSlotRepository);
     }
 
+//    private Booking item(String startsAt, String endsAt) {
+//        Booking item = new Booking();
+//        item.getTimeSlot().setStartsAt(LocalDateTime.parse(startsAt));
+//        item.getTimeSlot().setEndsAt(LocalDateTime.parse(endsAt));
+//        return item;
+//    }
+
+    // TODO: skal slettes, hvis Maven stadig ikke bygger d. 3/10 kl. 10.51
     private Booking item(String startsAt, String endsAt) {
-        Booking item = new Booking();
-        item.getTimeSlot().setStartsAt(LocalDateTime.parse(startsAt));
-        item.getTimeSlot().setEndsAt(LocalDateTime.parse(endsAt));
-        return item;
+        Booking booking = new Booking();
+        TimeSlot slot = new TimeSlot();
+        slot.setStartsAt(LocalDateTime.parse(startsAt));
+        slot.setEndsAt(LocalDateTime.parse(endsAt));
+        booking.setTimeSlot(slot);
+        return booking;
     }
+
 
     @Test
     public void touchingIsAllowed_ok() {
