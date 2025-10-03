@@ -321,9 +321,9 @@ public class ReservationServiceImpl implements IReservationService {
         reservationRepository.save(reservation);
     }
 
-    @Override
-    public void deleteReservation(Long reservationId) {
-    }
+//    @Override
+//    public void deleteReservation(Long reservationId) {
+//    }
 
 
 }
