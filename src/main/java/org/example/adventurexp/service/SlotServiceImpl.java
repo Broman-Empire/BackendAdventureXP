@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 
 @Service
@@ -24,7 +25,7 @@ public class SlotServiceImpl implements ISlotService {
         this.activityRepository = activityRepository;
     }
 
-    // Opretter tidsrum (slots) for en given aktivitet (hvis den oprettes/ændres) ud fra:
+    // ---- Opretter tidsrum (slots) for en given aktivitet (hvis den oprettes/ændres) ud fra:
     // aktivitetens varighed (duration), antal baner (parallelCourts)
     // samt antal deltagere (capacity) for hvert slot inden for åbningstiden
     @Override
@@ -53,16 +54,9 @@ public class SlotServiceImpl implements ISlotService {
 
                 LocalDateTime slotEnd = slotStart.plusMinutes(durationMinutes);
 
-                // Opret et slot hver hver "parallelCourt"
+                // Opret et slot hver hver "parallelCourt" = flere baner i samme tidsrum
                 for (int court = 1; court <= parallelCourts; court++) {
-                    TimeSlot slot = new TimeSlot();
-                    slot.setActivity(activity);
-                    slot.setStartsAt(slotStart);
-                    slot.setEndsAt(slotEnd);
-                    slot.setCourt(court);
-                    slot.setCapacity(maxParticipants); // max antal deltagere pr. slot
-
-                    timeSlotRepository.save(slot);
+                    createIfNotExists(activityId, slotStart, slotEnd, maxParticipants, court);
                 }
                 // Et slot kan starte, når et andet slot slutter
                 slotStart = slotEnd;
@@ -71,6 +65,30 @@ public class SlotServiceImpl implements ISlotService {
             currentDate = currentDate.plusDays(1);
 
         }
+    }
 
+// ---- Opretter et slot, hvis der ikke allerede findes et slot med samme starttidspunkt og bane (activityId + start + court = unik)
+    public void createIfNotExists(Long activityId, LocalDateTime start, LocalDateTime end, int capacity, int court) {
+
+        Optional<Activity> optActivity = activityRepository.findById(activityId);
+        if (optActivity.isEmpty()) {
+            throw new IllegalArgumentException("Activity not found with id: " + activityId);
+        }
+
+        Activity activity = optActivity.get();
+
+        // Tjekker om der findes et slot for samme aktivitet + start + court
+        Optional<TimeSlot> existingTimeSlot = timeSlotRepository.findByActivityAndStartsAtAndCourt(activity, start, court);
+
+        if (existingTimeSlot.isEmpty()) {
+            TimeSlot timeslot = new TimeSlot();
+            timeslot.setActivity(activity);
+            timeslot.setStartsAt(start);
+            timeslot.setEndsAt(end);
+            timeslot.setCapacity(capacity);
+            timeslot.setCourt(court);
+
+            timeSlotRepository.save(timeslot);
+        }
     }
 }
