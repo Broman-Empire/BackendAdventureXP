@@ -2,11 +2,13 @@ package org.example.adventurexp.service;
 
 import org.example.adventurexp.dto.AvailabilityDTO;
 import org.example.adventurexp.model.Activity;
+import org.example.adventurexp.model.Equipment;
 import org.example.adventurexp.model.TimeSlot;
 import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class AvailabilityServiceImpl implements IAvailabilityService {
@@ -42,6 +44,16 @@ public class AvailabilityServiceImpl implements IAvailabilityService {
         return Math.max(remaining, 0); // Returnér aldrig negativt antal
     }
 
+    @Override
+    public int activeEquipmentSets(long activityId) {
+        List<Equipment> equipmentList = equipmentService.getEquipmentByActivityId(activityId);
+        if (equipmentList == null || equipmentList.isEmpty()) {
+            return 0;
+        }
+        return equipmentList.stream()
+                .mapToInt(Equipment::getUsableSets)
+                .sum();
+    }
 
 }
     //Chattens forslag til løsning:
