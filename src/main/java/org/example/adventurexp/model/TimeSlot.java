@@ -31,6 +31,8 @@ public class TimeSlot {
 
     private int court; // Hvilken parallelCourt dette slot repræsenterer (bane 1, 2 osv)
 
+
+
     /**
      * Capacity angiver hvor mange deltagere der maksimalt kan bookes i dette slot.
      * Beregnes typisk ud fra aktivitetens maxParticipants * parallelUnits.
@@ -100,6 +102,14 @@ public class TimeSlot {
 
     public void setReservations(List<Booking> reservations) {
         this.reservations = reservations;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
     }
 
 }
