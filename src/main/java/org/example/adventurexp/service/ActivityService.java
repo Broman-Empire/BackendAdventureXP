@@ -21,6 +21,11 @@ public class ActivityService implements IActivityService {
 
     @Override
     public List<ActivityDTO> findAll() {
+
+        // Debugger
+        long count = activityRepository.count();
+        System.out.println("Antal rækker i activity: " + count);
+
         return activityRepository.findAll().stream()
                 .map(activity -> new ActivityDTO(
                         activity.getId(),

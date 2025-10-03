@@ -10,7 +10,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/activities")
+
 public class ActivityController {
 
     private final IActivityService activityService;
@@ -20,7 +20,7 @@ public class ActivityController {
     }
 
 
-    @GetMapping()
+    @GetMapping("/activities")
     public List<ActivityDTO> getAllActivities() {
         return activityService.findAll();
     }

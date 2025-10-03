@@ -15,7 +15,7 @@ VALUES
     (3, 'Minigolf sæt', 24, 24, 3),
     (4, 'Sumo sæt', 4, 4, 4);
 -- Tidsrum (TimeSlots)
-INSERT INTO timeslot (id, starts_at, ends_at, unit_number, activity_id, capacity)
+INSERT INTO time_slot (id, starts_at, ends_at, court, activity_id, capacity)
 VALUES
     (1, '2025-10-05 10:00:00', '2025-10-05 11:30:00', 1, 1, 12),
     (2, '2025-10-05 10:00:00', '2025-10-05 11:30:00', 2, 1, 12),

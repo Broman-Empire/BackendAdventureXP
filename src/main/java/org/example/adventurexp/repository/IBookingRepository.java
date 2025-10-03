@@ -12,16 +12,14 @@ import java.util.List;
 
 @Repository
 public interface IBookingRepository extends JpaRepository<Booking, Long> {
-    //Find by reservationID
+    // Find by reservationID
     List<Booking> findByReservationId(Long reservationId);
 
+    // Find bookings for en aktivitet i et tidsinterval
+    List<Booking> findByActivityIdAndTimeSlot_StartsAtBetween(Long activityId, LocalDateTime from, LocalDateTime to);
 
-	//Find bookings for en aktivitet i et tidsinterval
-	List<Booking> findByActivityIdAndTimeSlot(Long activityId, LocalDateTime from, LocalDateTime to);
-
-    //Find items between two start times
-    List<Booking> findByStartsAtBetween(LocalDateTime from, LocalDateTime to);
-
+    // Find items between two start times (evt. redundant med ovenstående)
+    List<Booking> findByTimeSlot_StartsAtBetween(LocalDateTime from, LocalDateTime to);
 
     @Query("""
            select coalesce(sum(b.participants), 0)
@@ -32,5 +30,28 @@ public interface IBookingRepository extends JpaRepository<Booking, Long> {
     int sumParticipantsByActivityAndSlot(@Param("activityId") Long activityId,
                                          @Param("timeSlotId") Long timeSlotId);
 }
+
+//@Repository
+//public interface IBookingRepository extends JpaRepository<Booking, Long> {
+//    //Find by reservationID
+//    List<Booking> findByReservationId(Long reservationId);
+//
+//
+//	//Find bookings for en aktivitet i et tidsinterval
+//	List<Booking> findByActivityIdAndTimeSlot(Long activityId, LocalDateTime from, LocalDateTime to);
+//
+//    //Find items between two start times
+//    List<Booking> findByStartsAtBetween(LocalDateTime from, LocalDateTime to);
+//
+//
+//    @Query("""
+//           select coalesce(sum(b.participants), 0)
+//           from Booking b
+//           where b.activity.id = :activityId
+//             and b.timeSlot.id = :timeSlotId
+//           """)
+//    int sumParticipantsByActivityAndSlot(@Param("activityId") Long activityId,
+//                                         @Param("timeSlotId") Long timeSlotId);
+//}
 
 
