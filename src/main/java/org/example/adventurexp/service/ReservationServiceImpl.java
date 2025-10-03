@@ -150,4 +150,12 @@ public class ReservationServiceImpl implements IReservationService {
 //            throw new IllegalArgumentException("Participants exceed usable equipment available");
 //        }
     }
+
+    @Override
+    public int reservedCount(TimeSlot slot, Activity activity) {
+        if (slot == null || slot.getId() == null || activity == null || activity.getId() == null) {
+            return 0;
+        }
+        return bookingRepository.sumParticipantsByActivityAndSlot(activity.getId(), slot.getId());
+    }
 }
