@@ -67,7 +67,9 @@ public class SlotServiceImpl implements ISlotService {
         }
     }
 
-// ---- Opretter et slot, hvis der ikke allerede findes et slot med samme starttidspunkt og bane (activityId + start + court = unik)
+
+   // ---- Hjælpemetode ----
+// Opretter et slot, hvis der ikke allerede findes et slot med samme starttidspunkt og bane (activityId + start + court = unik)
     public void createIfNotExists(Long activityId, LocalDateTime start, LocalDateTime end, int capacity, int court) {
 
         Optional<Activity> optActivity = activityRepository.findById(activityId);
