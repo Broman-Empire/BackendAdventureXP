@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
-public class AvailabilityServiceImpl {
+public class AvailabilityServiceImpl implements IAvailabilityService {
 
     private final ITimeSlotRepository timeSlotRepository;
     private final IEquipmentService equipmentService;
@@ -32,17 +32,17 @@ public class AvailabilityServiceImpl {
         return new AvailabilityDTO[0];
     }
 
-//    public int computeRemaining(TimeSlot slot, Activity activity) {
-//        if (slot == null || activity == null) return 0; // Returnér 0 hvis slot eller aktivitet mangler
-//
-//        int usableSets = equipmentService.usableSets(activity); // Hent antal brugbare udstyrssæt
-//        int reservedCount = reservationService.reservedCount(slot, activity); // Hent antal reserverede pladser
-//        int slotCapacity = slot.getCapacity(); // Hent kapacitet for tidsrummet
-//        int maxPossible = Math.min(slotCapacity, usableSets); // Find det maksimale antal mulige deltagere
-//        int remaining = maxPossible - reservedCount; // Beregn ledige pladser
-//
-//        return Math.max(remaining, 0); // Returnér aldrig negativt antal
-//    }
+    public int computeRemaining(TimeSlot slot, Activity activity) {
+        if (slot == null || activity == null) return 0; // Returnér 0 hvis slot eller aktivitet mangler
+
+        int usableSets = equipmentService.usableSets(activity); // Hent antal brugbare udstyrssæt
+        int reservedCount = reservationService.reservedCount(slot, activity); // Hent antal reserverede pladser
+        int slotCapacity = slot.getCapacity(); // Hent kapacitet for tidsrummet
+        int maxPossible = Math.min(slotCapacity, usableSets); // Find det maksimale antal mulige deltagere
+        int remaining = maxPossible - reservedCount; // Beregn ledige pladser
+
+        return Math.max(remaining, 0); // Returnér aldrig negativt antal
+    }
 
 
     public int activeEquipmentSets(long activityId) {
