@@ -1,9 +1,11 @@
 package org.example.adventurexp.service;
 
+import org.example.adventurexp.dto.ActivityDTO;
 import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.repository.IActivityRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -16,8 +18,15 @@ public class ActivityService implements IActivityService {
     }
   
     @Override
-    public List<Activity> findAll() {
-        return activityRepository.findAll();
+    public List<ActivityDTO> findAll() {
+        return activityRepository.findAll().stream()
+                .map(activity -> new ActivityDTO(
+                        activity.getId(),
+                        activity.getName(),
+                        activity.getMinAge(),
+                        activity.getDurationMinutes()
+                ))
+                .toList();
     }
 
     @Override
