@@ -11,4 +11,6 @@ public interface IAvailabilityService {
     AvailabilityDTO[] getDailyAvailability(long activityId, LocalDate date);
 
     int computeRemaining(TimeSlot slot, Activity activity);
+
+
 }
