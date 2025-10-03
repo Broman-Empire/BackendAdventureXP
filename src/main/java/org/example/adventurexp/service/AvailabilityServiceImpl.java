@@ -76,7 +76,7 @@ public class AvailabilityServiceImpl implements IAvailabilityService {
 
     @Override
     public int activeEquipmentSets(long activityId) {
-        List<Equipment> equipmentList = iEquipmentService.getEquipmentByActivityId(activityId);
+        List<Equipment> equipmentList = equipmentService.getEquipmentByActivityId(activityId);
         if (equipmentList == null || equipmentList.isEmpty()) {
             return 0;
         }

@@ -111,5 +111,4 @@ public class TimeSlot {
     public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
-
 }
