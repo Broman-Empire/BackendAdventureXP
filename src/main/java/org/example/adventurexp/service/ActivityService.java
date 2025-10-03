@@ -14,10 +14,16 @@ public class ActivityService implements IActivityService {
     public ActivityService(IActivityRepository activityRepository) {
         this.activityRepository = activityRepository;
     }
-
-
-    @Override
+  
+  @Override
     public List<Activity> findAll() {
         return activityRepository.findAll();
     }
+
+    @Override
+    public Activity createActivity(Activity activity) {
+        return activityRepository.save(activity);
+    }
+
+    
 }
