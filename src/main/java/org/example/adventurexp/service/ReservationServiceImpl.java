@@ -1,7 +1,11 @@
 package org.example.adventurexp.service;
 
+import jakarta.transaction.Transactional;
 import org.example.adventurexp.dto.CreateReservationDTO;
+import org.example.adventurexp.dto.ReservationResponse;
+import org.example.adventurexp.dto.UpdateReservationRequest;
 import org.example.adventurexp.model.Activity;
+import org.example.adventurexp.model.Reservation;
 import org.example.adventurexp.model.TimeSlot;
 import org.example.adventurexp.repository.IActivityRepository;
 import org.example.adventurexp.repository.IBookingRepository;
@@ -11,24 +15,28 @@ import org.example.adventurexp.model.Booking;
 import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
 @Service
 public class ReservationServiceImpl implements IReservationService {
 
-    private final IReservationRepository reservationRepository;
-    private final IBookingRepository bookingRepository;
-    private final IActivityRepository activityRepository;
-    private final ITimeSlotRepository timeSlotRepository;
+    private final IReservationRepository iReservationRepository;
+    private final IBookingRepository iBookingRepository;
+    private final IActivityRepository iActivityRepository;
+    private final ITimeSlotRepository iTimeSlotRepository;
+    private final IEquipmentService iEquipmentService;
 
-    public ReservationServiceImpl(IReservationRepository reservationRepository, IBookingRepository bookingRepository, IActivityRepository activityRepository, ITimeSlotRepository timeSlotRepository) {
+    public ReservationServiceImpl(IReservationRepository iReservationRepository, IBookingRepository iBookingRepository,
+                                  IActivityRepository iActivityRepository, ITimeSlotRepository iTimeSlotRepository, IEquipmentService iEquipmentService) {
 
-        this.reservationRepository = reservationRepository;
-        this.bookingRepository = bookingRepository;
-        this.activityRepository = activityRepository;
-        this.timeSlotRepository = timeSlotRepository;
+        this.iReservationRepository = iReservationRepository;
+        this.iBookingRepository = iBookingRepository;
+        this.iActivityRepository = iActivityRepository;
+        this.iTimeSlotRepository = iTimeSlotRepository;
+        this.iEquipmentService = iEquipmentService;
+
     }
 
     public void ensureNoOverlaps(List<Booking> bookings) {
@@ -38,7 +46,7 @@ public class ReservationServiceImpl implements IReservationService {
 
         // Slå alle timeslots op for bookings
         List<TimeSlot> timeSlots = bookings.stream()
-                .map(b -> timeSlotRepository.findById(b.getTimeSlot().getId())
+                .map(b -> iTimeSlotRepository.findById(b.getTimeSlot().getId())
                         .orElseThrow(() -> new IllegalArgumentException("Invalid timeslot for bookings " + b.getId())))
                 .sorted(Comparator.comparing(TimeSlot::getStartsAt))
                 .toList();
@@ -121,7 +129,7 @@ public class ReservationServiceImpl implements IReservationService {
                 throw new IllegalArgumentException("Company bookings require group min age ≥ 16");
             }
         } else if ("PRIVATE".equals(type)) {
-            Activity activity = activityRepository.findById(dto.getActivityId())
+            Activity activity = iActivityRepository.findById(dto.getActivityId())
                     .orElseThrow(() -> new IllegalArgumentException("Activity not found: " + dto.getActivityId()));
             Integer minAge = activity.getMinAge(); // Minigolf can be null = no limit
             if (minAge != null && groupMinAge < minAge) {
@@ -131,23 +139,220 @@ public class ReservationServiceImpl implements IReservationService {
             throw new IllegalArgumentException("Unknown customer type: " + dto.getCustomerType());
         }
 
-        // TODO: MANGLER Slot model og repository til at fuldføre nedenstående
-//        // Slot and capacity checks
-//        if (dto.getSlotId() == null) {
-//            throw new IllegalArgumentException("slotId is required");
-//        }
-//        Slot slot = slotRepository.findById(dto.getSlotId())
-//                .orElseThrow(() -> new IllegalArgumentException("Slot not found: " + dto.getSlotId()));
-//        Integer remaining = slot.getRemaining();
-//        if (remaining == null || remaining < dto.getParticipants()) {
-//            throw new IllegalArgumentException("Not enough remaining capacity in selected slot");
-//        }
+        // Slot and capacity checks
+        if (dto.getSlotId() == null) {
+            throw new IllegalArgumentException("slotId is required");
+        }
+        TimeSlot slot = iTimeSlotRepository.findById(dto.getSlotId())
+                .orElseThrow(() -> new IllegalArgumentException("Slot not found: " + dto.getSlotId()));
 
-        // TODO: MANGLER equipment logik til at fuldføre nedenstående
+        Activity activity = iActivityRepository.findById(dto.getActivityId())
+                .orElseThrow(() -> new IllegalArgumentException("Activity not found: " + dto.getActivityId()));
+
+        // Calculate remaining capacity
+        int usableSets = iEquipmentService.usableSets(activity);
+        int reservedCount = reservedCount(slot, activity);
+        int maxPossible = Math.min(slot.getCapacity(), usableSets);
+        int remaining = maxPossible - reservedCount;
+
+        if (remaining < dto.getParticipants()) {
+            throw new IllegalArgumentException("Not enough remaining capacity in selected slot. Available: " + remaining + ", requested: " + dto.getParticipants());
+        }
+
+        // TODO: MANGLER equipment logik til at fuldfÃ¸re nedenstÃ¥ende
 //        // Equipment availability check
 //        Integer usableSets = dto.getUsableSets();
 //        if (usableSets != null && dto.getParticipants() > usableSets) {
 //            throw new IllegalArgumentException("Participants exceed usable equipment available");
 //        }
     }
+
+    @Override
+    public int reservedCount(TimeSlot slot, Activity activity) {
+        if (slot == null || slot.getId() == null || activity == null || activity.getId() == null) {
+            return 0;
+        }
+        return iBookingRepository.sumParticipantsByActivityAndSlot(activity.getId(), slot.getId());
+    }
+
+    @Transactional
+    @Override
+    public void cancelReservation(Long reservationId) {
+        if (reservationId == null) {
+            throw new IllegalArgumentException("Reservation ID cannot be null");
+        }
+
+        Reservation reservation = iReservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + reservationId));
+
+        // Delete reservation - cascade will handle deleting associated bookings
+        // No need to manually adjust reservedCount since we calculate it dynamically via reservedCount() method
+        iReservationRepository.delete(reservation);
+    }
+
+
+    // Note: Reserved count tracking removed - we calculate it dynamically via reservedCount() method instead
+
+
+    @Transactional
+    @Override
+    public ReservationResponse createReservation(CreateReservationDTO request) {
+        // Step 1: Validate the reservation
+        validateReservation(request);
+
+        // Step 2: Fetch Activity and TimeSlot
+        Activity activity = iActivityRepository.findById(request.getActivityId())
+                .orElseThrow(() -> new IllegalArgumentException("Activity not found: " + request.getActivityId()));
+        TimeSlot slot = iTimeSlotRepository.findById(request.getSlotId())
+                .orElseThrow(() -> new IllegalArgumentException("TimeSlot not found: " + request.getSlotId()));
+
+        // Step 3: Create and save Reservation
+        Reservation reservation = new Reservation();
+        reservation.setCustomerType(request.getCustomerType());
+        reservation.setContactName(request.getContactName());
+        reservation.setEmail(request.getEmail());
+        reservation.setPhone(request.getPhone());
+        reservation.setCreatedAt(LocalDateTime.now());
+        reservation = iReservationRepository.save(reservation);
+
+        // Step 4: Create and save Booking
+        Booking booking = new Booking();
+        booking.setReservation(reservation);
+        booking.setActivity(activity);
+        booking.setTimeSlot(slot);
+        booking.setParticipants(request.getParticipants());
+        iBookingRepository.save(booking);
+
+        // Step 5: Apply capacity changes (if using reserved count tracking)
+        // addToSlotReservedCount(slot, request.getParticipants());
+
+        // Step 6: Return ReservationResponse
+        return new ReservationResponse(
+                reservation.getId(),
+                activity.getId(),
+                (long) booking.getParticipants(),
+                (long) booking.getParticipants(),
+                slot.getStartsAt()
+        );
+    }
+
+    /**
+     * Applies capacity changes when creating a new booking.
+     * Since we calculate reservedCount dynamically, this method is primarily for validation.
+     * @param booking The booking item being created
+     */
+    private void applyCapacityOnCreate(Booking booking) {
+        if (booking == null || booking.getTimeSlot() == null || booking.getActivity() == null) {
+            throw new IllegalArgumentException("Booking, timeSlot, and activity are required");
+        }
+
+        TimeSlot slot = booking.getTimeSlot();
+        Activity activity = booking.getActivity();
+        int participants = booking.getParticipants();
+
+        // Calculate current capacity
+        int usableSets = iEquipmentService.usableSets(activity);
+        int reservedCount = reservedCount(slot, activity);
+        int maxPossible = Math.min(slot.getCapacity(), usableSets);
+        int remaining = maxPossible - reservedCount;
+
+        // Validate that we have capacity
+        if (remaining < participants) {
+            throw new IllegalArgumentException(
+                    String.format("Insufficient capacity for slot %d. Available: %d, requested: %d",
+                            slot.getId(), remaining, participants)
+            );
+        }
+
+        // No need to manually increment - the booking is saved and will be counted in next reservedCount() call
+    }
+
+
+    @Transactional
+    @Override
+    public void updateReservation(UpdateReservationRequest req) {
+        if (req == null || req.getReservationId() == null) {
+            throw new IllegalArgumentException("Update request and reservation ID are required");
+        }
+
+        // Fetch existing reservation
+        Reservation reservation = iReservationRepository.findById(req.getReservationId())
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + req.getReservationId()));
+
+        // Update contact information if provided
+        if (req.getContactName() != null && !req.getContactName().isBlank()) {
+            reservation.setContactName(req.getContactName());
+        }
+        if (req.getEmail() != null && !req.getEmail().isBlank()) {
+            reservation.setEmail(req.getEmail());
+        }
+        if (req.getPhone() != null && !req.getPhone().isBlank()) {
+            reservation.setPhone(req.getPhone());
+        }
+
+        // Find the booking associated with this reservation (assuming one booking per reservation for now)
+        List<Booking> bookings = iBookingRepository.findByReservationId(req.getReservationId());
+        if (bookings.isEmpty()) {
+            throw new IllegalArgumentException("No bookings found for reservation: " + req.getReservationId());
+        }
+
+        Booking booking = bookings.get(0); // Get first booking
+
+        // Handle activity or timeslot changes
+        boolean activityChanged = req.getActivityId() != null && !req.getActivityId().equals(booking.getActivity().getId());
+        boolean participantsChanged = req.getNewParticipants() != null && !req.getNewParticipants().equals(booking.getParticipants());
+
+        if (activityChanged || req.getNewStart() != null || participantsChanged) {
+            // Fetch new activity if changed
+            Activity newActivity = booking.getActivity();
+            if (activityChanged) {
+                newActivity =iActivityRepository.findById(req.getActivityId())
+                        .orElseThrow(() -> new IllegalArgumentException("Activity not found: " + req.getActivityId()));
+            }
+
+            // Find new timeslot if start time changed
+            TimeSlot newSlot = booking.getTimeSlot();
+            if (req.getNewStart() != null) {
+                // Note: This assumes you have a way to find slots by start time and activity
+                // You may need to add a query method to ITimeSlotRepository
+                throw new UnsupportedOperationException("Changing reservation start time requires additional repository method");
+                // Example: newSlot = timeSlotRepository.findByActivityIdAndStartsAt(newActivity.getId(), req.getNewStart())
+                //              .orElseThrow(() -> new IllegalArgumentException("No slot found for the requested time"));
+            }
+
+            // Validate new booking parameters
+            int newParticipantCount = req.getNewParticipants() != null ? req.getNewParticipants() : booking.getParticipants();
+
+            // Check capacity for new slot
+            int usableSets = iEquipmentService.usableSets(newActivity);
+            int reservedCount = reservedCount(newSlot, newActivity);
+
+            // Subtract current booking's participants if it's the same slot (to avoid counting it twice)
+            if (newSlot.getId().equals(booking.getTimeSlot().getId()) && newActivity.getId().equals(booking.getActivity().getId())) {
+                reservedCount -= booking.getParticipants();
+            }
+
+            int maxPossible = Math.min(newSlot.getCapacity(), usableSets);
+            int remaining = maxPossible - reservedCount;
+
+            if (remaining < newParticipantCount) {
+                throw new IllegalArgumentException("Not enough capacity in selected slot. Available: " + remaining + ", requested: " + newParticipantCount);
+            }
+
+            // Update booking
+            booking.setActivity(newActivity);
+            booking.setTimeSlot(newSlot);
+            booking.setParticipants(newParticipantCount);
+            iBookingRepository.save(booking);
+        }
+
+        // Save updated reservation
+        iReservationRepository.save(reservation);
+    }
+
+//    @Override
+//    public void deleteReservation(Long reservationId) {
+//    }
+
+
 }
