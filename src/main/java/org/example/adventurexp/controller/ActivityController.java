@@ -1,5 +1,6 @@
 package org.example.adventurexp.controller;
 
+
 import org.example.adventurexp.dto.ActivityDTO;
 import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.service.IActivityService;
@@ -9,8 +10,6 @@ import java.util.List;
 
 
 @RestController
-
-
 @RequestMapping("/api/activities")
 public class ActivityController {
 
@@ -21,7 +20,6 @@ public class ActivityController {
     }
 
     public List<ActivityDTO> getAllActivities() {
-
         return activityService.findAll();
     }
 
