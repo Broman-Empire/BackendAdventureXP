@@ -11,24 +11,25 @@ import org.example.adventurexp.model.Booking;
 import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
 @Service
 public class ReservationServiceImpl implements IReservationService {
 
-    private final IReservationRepository reservationRepository;
-    private final IBookingRepository bookingRepository;
-    private final IActivityRepository activityRepository;
-    private final ITimeSlotRepository timeSlotRepository;
+    private final IReservationRepository iReservationRepository;
+    private final IBookingRepository iBookingRepository;
+    private final IActivityRepository iActivityRepository;
+    private final ITimeSlotRepository iTimeSlotRepository;
 
-    public ReservationServiceImpl(IReservationRepository reservationRepository, IBookingRepository bookingRepository, IActivityRepository activityRepository, ITimeSlotRepository timeSlotRepository) {
+    public ReservationServiceImpl(IReservationRepository iReservationRepository, IBookingRepository iBookingRepository,
+                                  IActivityRepository iActivityRepository, ITimeSlotRepository iTimeSlotRepository) {
 
-        this.reservationRepository = reservationRepository;
-        this.bookingRepository = bookingRepository;
-        this.activityRepository = activityRepository;
-        this.timeSlotRepository = timeSlotRepository;
+        this.iReservationRepository = iReservationRepository;
+        this.iBookingRepository = iBookingRepository;
+        this.iActivityRepository = iActivityRepository;
+        this.iTimeSlotRepository = iTimeSlotRepository;
     }
 
     public void ensureNoOverlaps(List<Booking> bookings) {
@@ -38,7 +39,7 @@ public class ReservationServiceImpl implements IReservationService {
 
         // Slå alle timeslots op for bookings
         List<TimeSlot> timeSlots = bookings.stream()
-                .map(b -> timeSlotRepository.findById(b.getTimeSlot().getId())
+                .map(b -> iTimeSlotRepository.findById(b.getTimeSlot().getId())
                         .orElseThrow(() -> new IllegalArgumentException("Invalid timeslot for bookings " + b.getId())))
                 .sorted(Comparator.comparing(TimeSlot::getStartsAt))
                 .toList();
@@ -121,7 +122,7 @@ public class ReservationServiceImpl implements IReservationService {
                 throw new IllegalArgumentException("Company bookings require group min age ≥ 16");
             }
         } else if ("PRIVATE".equals(type)) {
-            Activity activity = activityRepository.findById(dto.getActivityId())
+            Activity activity = iActivityRepository.findById(dto.getActivityId())
                     .orElseThrow(() -> new IllegalArgumentException("Activity not found: " + dto.getActivityId()));
             Integer minAge = activity.getMinAge(); // Minigolf can be null = no limit
             if (minAge != null && groupMinAge < minAge) {
@@ -151,8 +152,20 @@ public class ReservationServiceImpl implements IReservationService {
 //        }
     }
 
+    // Returnerer antallet af bookinger for en aktivitet i et givent tidsrum (TimeSlot).
+    // Metoden var slettet, måske ligger den hos en af jer andre.
     @Override
-    public int reservedCount(TimeSlot slot, Activity activity) {
-        return 0;
+    public int reservedCount(TimeSlot timeSlot, Activity activity) {
+        if (timeSlot == null || activity == null) return 0;
+
+        Long activityId = activity.getId(); // Hent aktivitetens ID
+        LocalDateTime start = timeSlot.getStartsAt(); // Hent starttidspunkt
+        LocalDateTime end = timeSlot.getEndsAt(); // Hent sluttidspunkt
+        // Hent bookinger for aktiviteten i tidsrummet
+        List<Booking> bookings = iBookingRepository.findByActivityIdAndTimeSlot(activityId, start, end);
+        // Returnér antallet af bookinger (0 hvis listen er null)
+        return bookings != null ? bookings.size() : 0;
+
     }
+
 }

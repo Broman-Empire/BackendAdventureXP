@@ -5,5 +5,6 @@ import org.example.adventurexp.model.TimeSlot;
 
 public interface IReservationService {
 
-    int reservedCount(TimeSlot slot, Activity activity);
+    int reservedCount(TimeSlot timeslot, Activity activity);
+
 }
