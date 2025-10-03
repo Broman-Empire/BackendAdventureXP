@@ -2,6 +2,7 @@ package org.example.adventurexp.service;
 
 import org.example.adventurexp.dto.AvailabilityDTO;
 import org.example.adventurexp.model.Activity;
+import org.example.adventurexp.model.Equipment;
 import org.example.adventurexp.model.TimeSlot;
 import org.example.adventurexp.repository.IActivityRepository;
 import org.example.adventurexp.repository.ITimeSlotRepository;
@@ -71,6 +72,17 @@ public class AvailabilityServiceImpl implements IAvailabilityService {
         int remaining = maxPossible - reservedCount; // Beregn ledige pladser
 
         return Math.max(remaining, 0); // Returnér aldrig negativt antal
+    }
+
+    @Override
+    public int activeEquipmentSets(long activityId) {
+        List<Equipment> equipmentList = equipmentService.getEquipmentByActivityId(activityId);
+        if (equipmentList == null || equipmentList.isEmpty()) {
+            return 0;
+        }
+        return equipmentList.stream()
+                .mapToInt(Equipment::getUsableSets)
+                .sum();
     }
 
 }
