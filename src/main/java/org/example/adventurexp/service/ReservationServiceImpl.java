@@ -15,9 +15,12 @@ import org.example.adventurexp.model.Booking;
 import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ReservationServiceImpl implements IReservationService {
@@ -354,5 +357,25 @@ public class ReservationServiceImpl implements IReservationService {
 //    public void deleteReservation(Long reservationId) {
 //    }
 
+    // Søger efter reservationer baseret på telefonnummer.
+    @Override
+    public List<Reservation> searchReservation(String phoneNumber) {
+        // Opret et set for at undgå dubletter
+        Set<Reservation> resultSet = new HashSet<>();
 
+        // Tjek at telefonnummer er angivet
+        if (phoneNumber != null && !phoneNumber.isBlank()) {
+            // Søg på telefonnummer
+            resultSet.addAll(iReservationRepository.findByCustomerPhoneContaining(phoneNumber));
+        } else {
+            throw new IllegalArgumentException("Phone number must be provided");
+        }
+        
+        // Hvis ingen reservationer findes, kast exception
+        if (resultSet.isEmpty()) {
+            throw new IllegalStateException("No reservation made with this phone number");
+        }
+        // Returnér listen af reservationer
+        return List.copyOf(resultSet);
+    }
 }
