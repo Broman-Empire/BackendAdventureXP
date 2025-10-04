@@ -366,7 +366,7 @@ public class ReservationServiceImpl implements IReservationService {
         // Tjek at telefonnummer er angivet
         if (phoneNumber != null && !phoneNumber.isBlank()) {
             // Søg på telefonnummer
-            resultSet.addAll(iReservationRepository.findByPhoneContaining(phoneNumber));
+            resultSet.addAll(iReservationRepository.findByPhone(phoneNumber));
         } else {
             throw new IllegalArgumentException("Phone number must be provided");
         }
