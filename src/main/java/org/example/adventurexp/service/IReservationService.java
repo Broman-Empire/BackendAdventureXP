@@ -5,7 +5,11 @@ import org.example.adventurexp.dto.CreateReservationDTO;
 import org.example.adventurexp.dto.ReservationResponse;
 import org.example.adventurexp.dto.UpdateReservationRequest;
 import org.example.adventurexp.model.Activity;
+import org.example.adventurexp.model.Reservation;
 import org.example.adventurexp.model.TimeSlot;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public interface IReservationService{
 
@@ -23,4 +27,6 @@ public interface IReservationService{
 
     @Transactional
     void updateReservation(UpdateReservationRequest req);
+
+    List<Reservation> getDaySchedule(LocalDate date);
 }
