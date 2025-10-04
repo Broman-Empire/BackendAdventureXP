@@ -6,7 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
+//Underscore (_) er Spring Data JPA’s måde at “navigere” mellem entitetsrelationer på.
+
+
 public interface IEquipmentRepository extends JpaRepository<Equipment, Long>{
 
     // Returnerer en liste af Equipment ud fra ActivityID

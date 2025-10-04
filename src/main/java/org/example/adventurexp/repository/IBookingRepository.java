@@ -10,13 +10,16 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Repository
+//Underscore (_) er Spring Data JPA’s måde at “navigere” mellem entitetsrelationer på.
+
 public interface IBookingRepository extends JpaRepository<Booking, Long> {
     // Find by reservationID
     List<Booking> findByReservationId(Long reservationId);
 
-    // Find bookings for en aktivitet i et tidsinterval
-    List<Booking> findByActivityIdAndTimeSlot_StartsAtBetween(Long activityId, LocalDateTime from, LocalDateTime to);
+    // Find bookings for en aktivitet, hvor TimeSlot's startsAt ligger i et angivet tidsinterval
+    List<Booking> findByTimeSlot_Activity_IdAndTimeSlot_StartsAtBetween(
+            Long activityId, LocalDateTime from, LocalDateTime to);
+
 
     // Find items between two start times (evt. redundant med ovenstående)
     List<Booking> findByTimeSlot_StartsAtBetween(LocalDateTime from, LocalDateTime to);

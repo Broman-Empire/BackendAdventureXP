@@ -44,7 +44,7 @@ public class TimeSlot {
 
     // Reservationer knyttet til dette slot
     @OneToMany(mappedBy = "timeSlot", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Booking> reservations = new ArrayList<>();
+    private List<Booking> bookings = new ArrayList<>();
 
 
 
@@ -98,12 +98,12 @@ public class TimeSlot {
         this.court = court;
     }
 
-    public List<Booking> getReservations() {
-        return reservations;
+    public List<Booking> getBookings() {
+        return bookings;
     }
 
-    public void setReservations(List<Booking> reservations) {
-        this.reservations = reservations;
+    public void setBooking(List<Booking> bookings) {
+        this.bookings = bookings;
     }
 
     public int getCapacity() {
