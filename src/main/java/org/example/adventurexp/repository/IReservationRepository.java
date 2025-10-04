@@ -11,5 +11,5 @@ import java.util.List;
 public interface IReservationRepository extends JpaRepository<Reservation, Long> {
 
 
-    List<Reservation> findByCustomerPhoneContaining(String phonenumber);
+    List<Reservation> findByPhoneContaining(String phone);
 }

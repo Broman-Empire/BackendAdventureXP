@@ -13,5 +13,5 @@ public class ActivityDTO {
     private Long id;
     private String name;
     private int minAge;
-    private double durationMinutes;
+    private int durationMinutes;
 }
