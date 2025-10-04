@@ -11,6 +11,8 @@ import java.util.List;
 
 
 @Entity
+@Table(name = "time_slot")
+
 public class TimeSlot {
 
     @Id

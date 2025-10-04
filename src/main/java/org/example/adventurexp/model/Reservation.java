@@ -10,6 +10,8 @@ import java.util.List;
 // ------ En kundes samlede booking (kontaktinfo osv.) ------
 
 @Entity
+@Table(name = "reservation")
+
 public class Reservation {
 
     @Id

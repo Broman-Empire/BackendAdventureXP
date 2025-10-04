@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 // Har relation til Reservation og TimeSlot
 
 @Entity
+@Table(name = "booking")
+
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
