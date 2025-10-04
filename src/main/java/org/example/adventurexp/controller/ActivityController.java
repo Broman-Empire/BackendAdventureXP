@@ -5,6 +5,7 @@ import org.example.adventurexp.dto.AvailabilityDTO;
 import org.example.adventurexp.service.IActivityService;
 import org.example.adventurexp.service.IAvailabilityService;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -29,7 +30,8 @@ public class ActivityController {
     }
 
     @GetMapping("/availability")
-    public AvailabilityDTO[] getAvailability(@RequestParam("activityId") long activityId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return availabilityService.getDailyAvailability(activityId, date);
+    public ResponseEntity<AvailabilityDTO[]> getAvailability(@RequestParam("activityId") long activityId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        AvailabilityDTO[] body = availabilityService.getDailyAvailability(activityId, date);
+        return ResponseEntity.ok(body != null ? body : new AvailabilityDTO[0]);
     }
 }
