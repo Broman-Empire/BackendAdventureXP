@@ -28,5 +28,7 @@ public interface IReservationService{
     @Transactional
     void updateReservation(UpdateReservationRequest req);
 
+    List<Reservation> getDaySchedule(LocalDate date);
+  
     List<Reservation> searchReservation(String string);
 }

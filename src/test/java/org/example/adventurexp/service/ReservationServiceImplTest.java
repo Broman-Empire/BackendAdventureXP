@@ -13,11 +13,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -96,4 +98,39 @@ class ReservationServiceImplTest {
         TimeSlot slot = new TimeSlot(); slot.setId(1L);
         assertEquals(0, sut.reservedCount(slot, null));
     }
+
+    @Test
+    void getDaySchedule_returnsEmpty_whenDateIsNull() {
+        var result = sut.getDaySchedule(null);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verifyNoInteractions(timeSlotRepository);
+    }
+
+    @Test
+    void getDaySchedule_returnsReservationsForDate() {
+        LocalDate date = LocalDate.of(2024, 6, 10);
+        LocalDateTime from = date.atStartOfDay();
+        LocalDateTime to = date.plusDays(1).atStartOfDay();
+
+        var reservation1 = new org.example.adventurexp.model.Reservation();
+        reservation1.setId(1L);
+        var booking1 = new Booking();
+        booking1.setReservation(reservation1);
+
+        var reservation2 = new org.example.adventurexp.model.Reservation();
+        reservation2.setId(2L);
+        var booking2 = new Booking();
+        booking2.setReservation(reservation2);
+
+
+        when(bookingRepository.findByStartsAtAndSort(from, to)).thenReturn(List.of(booking1, booking2));
+
+        var result = sut.getDaySchedule(date);
+
+        assertEquals(2, result.size());
+        assertTrue(result.stream().anyMatch(r -> r.getId().equals(1L)));
+        assertTrue(result.stream().anyMatch(r -> r.getId().equals(2L)));
+    }
+
 }
