@@ -20,7 +20,6 @@ public interface IBookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByTimeSlot_Activity_IdAndTimeSlot_StartsAtBetween(
             Long activityId, LocalDateTime from, LocalDateTime to);
 
-
     // Find items between two start times (evt. redundant med ovenstående)
     List<Booking> findByTimeSlot_StartsAtBetween(LocalDateTime from, LocalDateTime to);
 
