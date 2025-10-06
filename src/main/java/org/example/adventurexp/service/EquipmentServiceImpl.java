@@ -32,4 +32,9 @@ public class EquipmentServiceImpl implements IEquipmentService {
             return equipmentList.stream().mapToInt(Equipment::getUsableSets).sum();
         }
     }
+
+    @Override
+    public List<Equipment> listByActivity(long activityId) {
+        return getEquipmentByActivityId(activityId);
+    }
 }
