@@ -117,9 +117,12 @@ class AvailabilityServiceImplTest {
         when(slotService.generateSlots(activityId, from, to, open, close)).thenReturn(List.of(slot1, slot2)); // return both slots
         Activity activity = new Activity();
         when(activityRepository.findById(activityId)).thenReturn(Optional.of(activity)); // return activity
-        // slot1: available (remaining=2), slot2: full (remaining=0)
-        when(sut.computeRemaining(slot1, activity)).thenReturn(2);
-        when(sut.computeRemaining(slot2, activity)).thenReturn(0);
+        // for both slots, usableSets == 5
+        when(equipmentService.usableSets(activity)).thenReturn(5);
+        // slot1: remaining = min(5,5)-3 = 2
+        when(reservationService.reservedCount(slot1, activity)).thenReturn(3);
+        // slot2: remaining = min(5,5)-5 = 0 (full)
+        when(reservationService.reservedCount(slot2, activity)).thenReturn(5);
 
         AvailabilityDTO[] result = sut.getDailyAvailability(activityId, from, to, open, close); // execute
 
