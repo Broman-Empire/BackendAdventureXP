@@ -15,9 +15,12 @@ import org.example.adventurexp.model.Booking;
 import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ReservationServiceImpl implements IReservationService {
@@ -26,14 +29,17 @@ public class ReservationServiceImpl implements IReservationService {
     private final IBookingRepository iBookingRepository;
     private final IActivityRepository iActivityRepository;
     private final ITimeSlotRepository iTimeSlotRepository;
+    private final IEquipmentService iEquipmentService;
 
     public ReservationServiceImpl(IReservationRepository iReservationRepository, IBookingRepository iBookingRepository,
-                                  IActivityRepository iActivityRepository, ITimeSlotRepository iTimeSlotRepository) {
+                                  IActivityRepository iActivityRepository, ITimeSlotRepository iTimeSlotRepository, IEquipmentService iEquipmentService) {
 
         this.iReservationRepository = iReservationRepository;
         this.iBookingRepository = iBookingRepository;
         this.iActivityRepository = iActivityRepository;
         this.iTimeSlotRepository = iTimeSlotRepository;
+        this.iEquipmentService = iEquipmentService;
+
     }
 
     public void ensureNoOverlaps(List<Booking> bookings) {
@@ -140,14 +146,14 @@ public class ReservationServiceImpl implements IReservationService {
         if (dto.getSlotId() == null) {
             throw new IllegalArgumentException("slotId is required");
         }
-        TimeSlot slot = timeSlotRepository.findById(dto.getSlotId())
+        TimeSlot slot = iTimeSlotRepository.findById(dto.getSlotId())
                 .orElseThrow(() -> new IllegalArgumentException("Slot not found: " + dto.getSlotId()));
 
-        Activity activity = activityRepository.findById(dto.getActivityId())
+        Activity activity = iActivityRepository.findById(dto.getActivityId())
                 .orElseThrow(() -> new IllegalArgumentException("Activity not found: " + dto.getActivityId()));
 
         // Calculate remaining capacity
-        int usableSets = equipmentService.usableSets(activity);
+        int usableSets = iEquipmentService.usableSets(activity);
         int reservedCount = reservedCount(slot, activity);
         int maxPossible = Math.min(slot.getCapacity(), usableSets);
         int remaining = maxPossible - reservedCount;
@@ -169,7 +175,7 @@ public class ReservationServiceImpl implements IReservationService {
         if (slot == null || slot.getId() == null || activity == null || activity.getId() == null) {
             return 0;
         }
-        return bookingRepository.sumParticipantsByActivityAndSlot(activity.getId(), slot.getId());
+        return iBookingRepository.sumParticipantsByActivityAndSlot(activity.getId(), slot.getId());
     }
 
     @Transactional
@@ -179,12 +185,12 @@ public class ReservationServiceImpl implements IReservationService {
             throw new IllegalArgumentException("Reservation ID cannot be null");
         }
 
-        Reservation reservation = reservationRepository.findById(reservationId)
+        Reservation reservation = iReservationRepository.findById(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + reservationId));
 
         // Delete reservation - cascade will handle deleting associated bookings
         // No need to manually adjust reservedCount since we calculate it dynamically via reservedCount() method
-        reservationRepository.delete(reservation);
+        iReservationRepository.delete(reservation);
     }
 
 
@@ -198,9 +204,9 @@ public class ReservationServiceImpl implements IReservationService {
         validateReservation(request);
 
         // Step 2: Fetch Activity and TimeSlot
-        Activity activity = activityRepository.findById(request.getActivityId())
+        Activity activity = iActivityRepository.findById(request.getActivityId())
                 .orElseThrow(() -> new IllegalArgumentException("Activity not found: " + request.getActivityId()));
-        TimeSlot slot = timeSlotRepository.findById(request.getSlotId())
+        TimeSlot slot = iTimeSlotRepository.findById(request.getSlotId())
                 .orElseThrow(() -> new IllegalArgumentException("TimeSlot not found: " + request.getSlotId()));
 
         // Step 3: Create and save Reservation
@@ -210,7 +216,7 @@ public class ReservationServiceImpl implements IReservationService {
         reservation.setEmail(request.getEmail());
         reservation.setPhone(request.getPhone());
         reservation.setCreatedAt(LocalDateTime.now());
-        reservation = reservationRepository.save(reservation);
+        reservation = iReservationRepository.save(reservation);
 
         // Step 4: Create and save Booking
         Booking booking = new Booking();
@@ -218,7 +224,7 @@ public class ReservationServiceImpl implements IReservationService {
         booking.setActivity(activity);
         booking.setTimeSlot(slot);
         booking.setParticipants(request.getParticipants());
-        bookingRepository.save(booking);
+        iBookingRepository.save(booking);
 
         // Step 5: Apply capacity changes (if using reserved count tracking)
         // addToSlotReservedCount(slot, request.getParticipants());
@@ -233,6 +239,36 @@ public class ReservationServiceImpl implements IReservationService {
         );
     }
 
+    /**
+     * Applies capacity changes when creating a new booking.
+     * Since we calculate reservedCount dynamically, this method is primarily for validation.
+     * @param booking The booking item being created
+     */
+    private void applyCapacityOnCreate(Booking booking) {
+        if (booking == null || booking.getTimeSlot() == null || booking.getActivity() == null) {
+            throw new IllegalArgumentException("Booking, timeSlot, and activity are required");
+        }
+
+        TimeSlot slot = booking.getTimeSlot();
+        Activity activity = booking.getActivity();
+        int participants = booking.getParticipants();
+
+        // Calculate current capacity
+        int usableSets = iEquipmentService.usableSets(activity);
+        int reservedCount = reservedCount(slot, activity);
+        int maxPossible = Math.min(slot.getCapacity(), usableSets);
+        int remaining = maxPossible - reservedCount;
+
+        // Validate that we have capacity
+        if (remaining < participants) {
+            throw new IllegalArgumentException(
+                    String.format("Insufficient capacity for slot %d. Available: %d, requested: %d",
+                            slot.getId(), remaining, participants)
+            );
+        }
+
+        // No need to manually increment - the booking is saved and will be counted in next reservedCount() call
+    }
 
 
     @Transactional
@@ -243,7 +279,7 @@ public class ReservationServiceImpl implements IReservationService {
         }
 
         // Fetch existing reservation
-        Reservation reservation = reservationRepository.findById(req.getReservationId())
+        Reservation reservation = iReservationRepository.findById(req.getReservationId())
                 .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + req.getReservationId()));
 
         // Update contact information if provided
@@ -258,7 +294,7 @@ public class ReservationServiceImpl implements IReservationService {
         }
 
         // Find the booking associated with this reservation (assuming one booking per reservation for now)
-        List<Booking> bookings = bookingRepository.findByReservationId(req.getReservationId());
+        List<Booking> bookings = iBookingRepository.findByReservationId(req.getReservationId());
         if (bookings.isEmpty()) {
             throw new IllegalArgumentException("No bookings found for reservation: " + req.getReservationId());
         }
@@ -273,7 +309,7 @@ public class ReservationServiceImpl implements IReservationService {
             // Fetch new activity if changed
             Activity newActivity = booking.getActivity();
             if (activityChanged) {
-                newActivity = activityRepository.findById(req.getActivityId())
+                newActivity =iActivityRepository.findById(req.getActivityId())
                         .orElseThrow(() -> new IllegalArgumentException("Activity not found: " + req.getActivityId()));
             }
 
@@ -291,7 +327,7 @@ public class ReservationServiceImpl implements IReservationService {
             int newParticipantCount = req.getNewParticipants() != null ? req.getNewParticipants() : booking.getParticipants();
 
             // Check capacity for new slot
-            int usableSets = equipmentService.usableSets(newActivity);
+            int usableSets = iEquipmentService.usableSets(newActivity);
             int reservedCount = reservedCount(newSlot, newActivity);
 
             // Subtract current booking's participants if it's the same slot (to avoid counting it twice)
@@ -310,16 +346,36 @@ public class ReservationServiceImpl implements IReservationService {
             booking.setActivity(newActivity);
             booking.setTimeSlot(newSlot);
             booking.setParticipants(newParticipantCount);
-            bookingRepository.save(booking);
+            iBookingRepository.save(booking);
         }
 
         // Save updated reservation
-        reservationRepository.save(reservation);
+        iReservationRepository.save(reservation);
     }
 
 //    @Override
 //    public void deleteReservation(Long reservationId) {
 //    }
 
+    // Søger efter reservationer baseret på telefonnummer.
+    @Override
+    public List<Reservation> searchReservation(String phoneNumber) {
+        // Opret et set for at undgå dubletter
+        Set<Reservation> resultSet = new HashSet<>();
 
+        // Tjek at telefonnummer er angivet
+        if (phoneNumber != null && !phoneNumber.isBlank()) {
+            // Søg på telefonnummer
+            resultSet.addAll(iReservationRepository.findByCustomerPhoneContaining(phoneNumber));
+        } else {
+            throw new IllegalArgumentException("Phone number must be provided");
+        }
+        
+        // Hvis ingen reservationer findes, kast exception
+        if (resultSet.isEmpty()) {
+            throw new IllegalStateException("No reservation made with this phone number");
+        }
+        // Returnér listen af reservationer
+        return List.copyOf(resultSet);
+    }
 }

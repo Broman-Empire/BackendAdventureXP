@@ -2,6 +2,7 @@ package org.example.adventurexp.controller;
 
 import org.example.adventurexp.dto.ActivityDTO;
 import org.example.adventurexp.dto.AvailabilityDTO;
+import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.service.IActivityService;
 import org.example.adventurexp.service.IAvailabilityService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,7 +24,6 @@ public class ActivityController {
         this.activityService = activityService;
         this.availabilityService = availabilityService;
     }
-
     @GetMapping("/activities")
     public List<ActivityDTO> getAllActivities() {
         return activityService.findAll();
