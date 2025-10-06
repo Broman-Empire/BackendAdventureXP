@@ -29,4 +29,6 @@ public interface IReservationService{
     void updateReservation(UpdateReservationRequest req);
 
     List<Reservation> getDaySchedule(LocalDate date);
+  
+    List<Reservation> searchReservation(String string);
 }
