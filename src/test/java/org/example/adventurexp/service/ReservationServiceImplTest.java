@@ -90,6 +90,8 @@ class ReservationServiceImplTest {
 
         assertNotNull(response);
         assertEquals(1L, response.getId()); // check returned id
+        assertEquals(activity.getId(), response.getActivityId()); // check activity id
+        assertEquals(slot.getStartsAt(), response.getStartsAt()); // check startsAt
         verify(reservationRepository).save(any(Reservation.class));
         verify(bookingRepository).save(any(Booking.class));
     }
@@ -185,7 +187,6 @@ class ReservationServiceImplTest {
         TimeSlot slot = validSlot(dto.getSlotId(), 10);
 
         when(activityRepository.findById(dto.getActivityId())).thenReturn(Optional.of(activity)); // activity found
-        when(timeSlotRepository.findById(dto.getSlotId())).thenReturn(Optional.of(slot)); // slot found
 
         assertThrows(IllegalArgumentException.class, () -> sut.validateReservation(dto));
     }
