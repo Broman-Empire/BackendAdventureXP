@@ -32,6 +32,9 @@ public interface IBookingRepository extends JpaRepository<Booking, Long> {
            """)
     int sumParticipantsByActivityAndSlot(@Param("activityId") Long activityId,
                                          @Param("timeSlotId") Long timeSlotId);
+
+    List<Booking> findByStartsAtAndSort(LocalDateTime from, LocalDateTime to);
+
 }
 
 //@Repository

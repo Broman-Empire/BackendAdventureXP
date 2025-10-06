@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.*;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -351,6 +352,28 @@ public class ReservationServiceImpl implements IReservationService {
 
         // Save updated reservation
         iReservationRepository.save(reservation);
+    }
+
+    public List<Reservation> getDaySchedule(LocalDate date) {
+        if (date == null) return List.of();
+
+        LocalDateTime from = date.atStartOfDay();
+        LocalDateTime to   = date.plusDays(1).atStartOfDay();
+
+        // Brug den NYE sorterede repo-metode (bedst):
+        List<Booking> bookings = iBookingRepository.findByStartsAtAndSort(from, to);
+
+        if (bookings == null || bookings.isEmpty()) return List.of();
+
+        // LinkedHashMap bevarer rækkefølgen og sikrer unikke Reservation-objekter
+        Map<Long, Reservation> orderedUnique = new LinkedHashMap<>();
+        for (Booking b : bookings) {
+            if (b == null || b.getReservation() == null) continue;
+            var r = b.getReservation();
+            Long id = r.getId();
+            if (id != null) orderedUnique.putIfAbsent(id, r);
+        }
+        return new ArrayList<>(orderedUnique.values());
     }
 
 //    @Override
