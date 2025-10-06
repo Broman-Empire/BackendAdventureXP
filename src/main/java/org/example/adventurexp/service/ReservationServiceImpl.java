@@ -274,7 +274,7 @@ public class ReservationServiceImpl implements IReservationService {
 
     @Transactional
     @Override
-    public void updateReservation(UpdateReservationRequest req) {
+    public Reservation updateReservation(UpdateReservationRequest req) {
         if (req == null || req.getReservationId() == null) {
             throw new IllegalArgumentException("Update request and reservation ID are required");
         }
@@ -352,6 +352,7 @@ public class ReservationServiceImpl implements IReservationService {
 
         // Save updated reservation
         iReservationRepository.save(reservation);
+        return reservation;
     }
 
     public List<Reservation> getDaySchedule(LocalDate date) {
