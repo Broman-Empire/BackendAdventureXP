@@ -19,5 +19,7 @@ public interface ITimeSlotRepository extends JpaRepository<TimeSlot, Long> {
     // Til generateSlots() og createIfNotExists()
     Optional<TimeSlot> findByActivityAndStartsAtAndCourt(Activity activity, LocalDateTime startsAt, int court);
 
+    // For getAvailableSlots()
+    List<TimeSlot> findByActivityAndStartsAtAfter(Activity activity, LocalDateTime startsAt);
 
 }
