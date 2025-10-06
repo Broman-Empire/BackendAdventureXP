@@ -19,6 +19,8 @@ public class ActivityController {
         this.activityService = activityService;
     }
 
+
+    @GetMapping("")
     public List<ActivityDTO> getAllActivities() {
         return activityService.findAll();
     }

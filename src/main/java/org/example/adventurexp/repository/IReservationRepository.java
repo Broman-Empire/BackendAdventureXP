@@ -7,10 +7,11 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
-@Repository
+//Underscore (_) er Spring Data JPA’s måde at “navigere” mellem entitetsrelationer på.
+
+
 public interface IReservationRepository extends JpaRepository<Reservation, Long> {
 
-    Reservation findByReservationId(Long reservationId);
 
-    List<Reservation> findByCustomerPhoneContaining(String phonenumber);
+    List<Reservation> findByPhone(String phone);
 }

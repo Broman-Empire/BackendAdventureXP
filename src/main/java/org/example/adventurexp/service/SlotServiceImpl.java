@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Optional;
-import java.util.OptionalInt;
-
+import java.util.List;
 
 @Service
 public class SlotServiceImpl implements ISlotService {
@@ -29,7 +29,9 @@ public class SlotServiceImpl implements ISlotService {
     // aktivitetens varighed (duration), antal baner (parallelCourts)
     // samt antal deltagere (capacity) for hvert slot inden for åbningstiden
     @Override
-    public void generateSlots(Long activityId, LocalDate fromDate, LocalDate toDate, LocalTime openTime, LocalTime closeTime) {
+    public List<TimeSlot> generateSlots(Long activityId, LocalDate fromDate, LocalDate toDate, LocalTime openTime, LocalTime closeTime) {
+
+        List<TimeSlot> createdSlots = new ArrayList<>();
 
         Optional<Activity> optActivity = activityRepository.findById(activityId);
 
@@ -65,6 +67,7 @@ public class SlotServiceImpl implements ISlotService {
             currentDate = currentDate.plusDays(1);
 
         }
+        return createdSlots;
     }
 
 

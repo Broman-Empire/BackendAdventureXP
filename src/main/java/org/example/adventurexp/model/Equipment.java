@@ -3,11 +3,13 @@ package org.example.adventurexp.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "equipment")
+
 public class Equipment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String name;
     private int totalSets, usableSets;
@@ -27,11 +29,11 @@ public class Equipment {
 
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
