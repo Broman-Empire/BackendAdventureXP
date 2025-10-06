@@ -36,6 +36,11 @@ public interface IBookingRepository extends JpaRepository<Booking, Long> {
 
     boolean existsByActivity_Id(Long activityId);
 
+
+
+
+
+    long countByActivityId(Long activityId);
 }
 
 //@Repository
