@@ -124,7 +124,7 @@ class ReservationServiceImplTest {
         booking2.setReservation(reservation2);
 
 
-        when(bookingRepository.findByStartsAtAndSort(from, to)).thenReturn(List.of(booking1, booking2));
+        when(bookingRepository.findByTimeSlot_StartsAtBetween(from, to)).thenReturn(List.of(booking1, booking2));
 
         var result = sut.getDaySchedule(date);
 

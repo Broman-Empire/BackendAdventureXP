@@ -361,7 +361,7 @@ public class ReservationServiceImpl implements IReservationService {
         LocalDateTime to   = date.plusDays(1).atStartOfDay();
 
         // Brug den NYE sorterede repo-metode (bedst):
-        List<Booking> bookings = iBookingRepository.findByStartsAtAndSort(from, to);
+        List<Booking> bookings = iBookingRepository.findByTimeSlot_StartsAtBetween(from, to);
 
         if (bookings == null || bookings.isEmpty()) return List.of();
 
