@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/actrivities")
+@RequestMapping("/api")
 public class ActivityController {
 
     private final IActivityService activityService;
@@ -24,7 +24,7 @@ public class ActivityController {
         this.availabilityService = availabilityService;
     }
 
-    @GetMapping("/all")
+    @GetMapping("/activities")
     public List<ActivityDTO> getAllActivities() {
         return activityService.findAll();
     }
