@@ -29,7 +29,7 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/reservations/{id}/")
+    @PatchMapping("/reservations/{id}")
     public Reservation updateReservation(@PathVariable("id") Long id, @RequestBody UpdateReservationRequest updateRequest) {
         updateRequest.setReservationId(id);
         return reservationService.updateReservation(updateRequest);
