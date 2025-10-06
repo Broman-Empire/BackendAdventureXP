@@ -47,7 +47,7 @@ public class EquipmentServiceImpl implements IEquipmentService {
     public void addEquipment(long activityId, Equipment equipment) {
         Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new IllegalArgumentException("Activity not found: " + activityId));
 
-        //check for dupplicates
+        //check for duplicates
         List<Equipment> existingEquipment = equipmentRepository.findByActivityId(activityId)
                 .stream()
                 .filter(e -> e.getName().equalsIgnoreCase(equipment.getName()))
