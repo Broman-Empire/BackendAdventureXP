@@ -2,10 +2,8 @@ package org.example.adventurexp.controller;
 
 import org.example.adventurexp.model.Reservation;
 import org.example.adventurexp.service.IReservationService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,4 +21,11 @@ public class AdminController {
     public List<Reservation> getDailySchedule(@RequestParam("date")LocalDate date) {
         return reservationService.getDaySchedule(date);
     }
+
+    @DeleteMapping("/reservations/{id}")
+    public ResponseEntity<Void> deleteReservation(@PathVariable("id") Long id) {
+        reservationService.cancelReservation(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
