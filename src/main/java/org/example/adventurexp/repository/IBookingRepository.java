@@ -34,6 +34,11 @@ public interface IBookingRepository extends JpaRepository<Booking, Long> {
 
     // List<Booking> findByStartsAtAndSort(LocalDateTime from, LocalDateTime to);
 
+
+
+
+
+    long countByActivityId(Long activityId);
     boolean existsByActivity_Id(Long activityId);
 
 
