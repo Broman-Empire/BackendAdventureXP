@@ -1,5 +1,6 @@
 package org.example.adventurexp.controller;
 
+import org.example.adventurexp.dto.ReservationLookupDTO;
 import org.example.adventurexp.dto.ActivityDTO;
 import org.example.adventurexp.dto.UpdateReservationRequest;
 import org.example.adventurexp.model.Activity;
@@ -89,6 +90,14 @@ public class AdminController {
     public Reservation updateReservation(@PathVariable("id") Long id, @RequestBody UpdateReservationRequest updateRequest) {
         updateRequest.setReservationId(id);
         return reservationService.updateReservation(updateRequest);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ReservationLookupDTO>> searchReservation(
+            @RequestParam("phone") String phoneNumber) {
+
+        List<ReservationLookupDTO> result = reservationService.searchReservation(phoneNumber);
+        return ResponseEntity.ok(result);
     }
 
 }
