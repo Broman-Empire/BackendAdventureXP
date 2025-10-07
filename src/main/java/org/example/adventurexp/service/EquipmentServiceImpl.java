@@ -58,4 +58,21 @@ public class EquipmentServiceImpl implements IEquipmentService {
         equipment.setActivity(activity);
         equipmentRepository.save(equipment);
     }
+
+    @Override
+    public void updateEquipment(long equipmentId, Equipment patch) {
+        Equipment equipment = equipmentRepository.findById(equipmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Equipment not found: " + equipmentId));
+
+        if(patch.getName() != null) {
+            equipment.setName(patch.getName());
+        }
+        if(patch.getTotalSets() != 0) {
+            equipment.setTotalSets(patch.getTotalSets());
+        }
+        if(patch.getUsableSets() != 0) {
+            equipment.setUsableSets(patch.getUsableSets());
+        }
+        equipmentRepository.save(equipment);
+    }
 }
