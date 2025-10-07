@@ -2,11 +2,15 @@ package org.example.adventurexp.service;
 
 import org.example.adventurexp.dto.ActivityDTO;
 import org.example.adventurexp.model.Activity;
-import org.example.adventurexp.model.Booking;
+import org.example.adventurexp.model.TimeSlot;
 import org.example.adventurexp.repository.IActivityRepository;
+import org.example.adventurexp.repository.IBookingRepository;
+import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -14,9 +18,13 @@ public class ActivityService implements IActivityService {
 
     //IBookingService bookingService; // TODO Den findes ikke, men skal jo eksistere på et tidspunkt
     IActivityRepository activityRepository;
+    ITimeSlotRepository timeSlotRepository;
+    IBookingRepository bookingRepository;
+    ISlotService slotService;
 
-    public ActivityService(IActivityRepository activityRepository) {
+    public ActivityService(IActivityRepository activityRepository, IBookingRepository bookingRepository) {
         this.activityRepository = activityRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     @Override
@@ -55,16 +63,30 @@ public class ActivityService implements IActivityService {
 
     @Override
     public Activity deleteActivity(Long id) {
-//        Activity toBeDeleted = activityRepository.findById(id).orElseThrow();
-//        for (Booking booking : bookingService.findAll()) {
-//            if (booking.getActivity().getId().equals(id)) {
-//                // TODO Vi skal lige finde ud af, hvad vi præcis smider, hvis aktiviteten faktisk har bookinger ved sletning
-//                throw new IllegalArgumentException("Cannot delete activity with existing bookings");
-//            }
-//        }
-//        activityRepository.delete(toBeDeleted);
-//        return toBeDeleted;
-        return null;
+        Activity toBeDeleted = activityRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Activity not found: " + id));
+
+        long bookingCount = bookingRepository.countByActivityId(id);
+        if (bookingCount > 0) {
+            throw new IllegalArgumentException("Cannot delete activity with existing bookings");
+        }
+        activityRepository.delete(toBeDeleted);
+        return toBeDeleted;
+    }
+
+    public void regenerateFutureSlots(Long activityId, LocalDate fromDate) {
+        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new IllegalArgumentException("Activity not found: " + activityId));
+
+        // Delete existing slots from 'fromDate' onwards
+        LocalDateTime fromDateTime = fromDate.atStartOfDay();
+        List<TimeSlot> slotsToDelete = timeSlotRepository.findByActivityAndStartsAtAfter(activity, fromDateTime);
+        timeSlotRepository.deleteAll(slotsToDelete);
+
+        // Regenerate slots (daily from 08 to 22)
+        LocalDate toDate = fromDate.plusDays(30); // Regenerate slots for the next 30 days
+        LocalTime openTime = LocalTime.of(8, 0); // opens at 08:00
+        LocalTime closeTime = LocalTime.of(22, 0); // closes at 22:00
+
+        slotService.generateSlots(activityId, fromDate, toDate, openTime, closeTime);
     }
 
 }

@@ -14,5 +14,11 @@ public interface IEquipmentService {
 
     int usableSets(Activity activity);
 
+    List<Equipment> listByActivity(long activityId);
 
+    Equipment addEquipment(long activityId, Equipment equipment);
+
+    Equipment updateEquipment(long equipmentId, Equipment patch);
+
+    void deleteEquipment(long equipmentId);
 }
