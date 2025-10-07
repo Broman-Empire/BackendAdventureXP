@@ -1,6 +1,7 @@
 package org.example.adventurexp.service;
 
 import org.example.adventurexp.dto.ActivityDTO;
+import org.example.adventurexp.mapper.ActivityMapper;
 import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.model.TimeSlot;
 import org.example.adventurexp.repository.IActivityRepository;
@@ -34,14 +35,10 @@ public class ActivityService implements IActivityService {
         long count = activityRepository.count();
         System.out.println("Antal rækker i activity: " + count);
 
-        return activityRepository.findAll().stream()
-                .map(activity -> new ActivityDTO(
-                        activity.getId(),
-                        activity.getName(),
-                        activity.getMinAge(),
-                        activity.getDurationMinutes()
-                ))
-                .toList();
+        return activityRepository.findAll()
+                .stream()// Laver listen: "pipeline"
+                .map(ActivityMapper::toDTO) // Kalder metode på hvert element i stream'et -> method reference i Java
+                .toList(); // Returnerer DTO'er i en liste
     }
 
     @Override
