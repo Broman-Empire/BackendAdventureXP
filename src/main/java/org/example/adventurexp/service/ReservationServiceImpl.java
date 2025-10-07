@@ -43,6 +43,35 @@ public class ReservationServiceImpl implements IReservationService {
 
     }
 
+    @Override
+    public ReservationResponse getReservationById(Long id) {
+        Reservation reservation = iReservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + id));
+
+        // handle empty bookings
+        if (reservation.getBookings() == null || reservation.getBookings().isEmpty()) {
+            return new ReservationResponse(reservation.getId(), null, 0L, 0L, null);
+        }
+        // use first booking to fetch activityId, participants, startsAt
+        Booking firstBooking = reservation.getBookings().getFirst();
+        Long activityId = firstBooking.getActivity() != null ? firstBooking.getActivity().getId() : null;
+        Long participants = (long) firstBooking.getParticipants();
+        LocalDateTime startsAt = firstBooking.getTimeSlot() != null ? firstBooking.getTimeSlot().getStartsAt() : null;
+
+        // sum all participants across all bookings
+        Long totalParticipants = reservation.getBookings().stream()
+                .mapToLong(Booking::getParticipants)
+                .sum();
+
+        return new ReservationResponse(
+                reservation.getId(),
+                activityId,
+                participants,
+                totalParticipants,
+                startsAt
+        );
+    }
+
     public void ensureNoOverlaps(List<Booking> bookings) {
         if (bookings == null || bookings.isEmpty()) {
             return;

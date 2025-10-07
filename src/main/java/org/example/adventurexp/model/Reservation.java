@@ -88,4 +88,8 @@ public class Reservation {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public List<Booking> getBookings() {
+        return bookings;
+    }
 }
