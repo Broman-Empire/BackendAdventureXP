@@ -2,6 +2,7 @@ package org.example.adventurexp.service;
 
 import jakarta.transaction.Transactional;
 import org.example.adventurexp.dto.CreateReservationDTO;
+import org.example.adventurexp.dto.ReservationLookupDTO;
 import org.example.adventurexp.dto.ReservationResponse;
 import org.example.adventurexp.dto.UpdateReservationRequest;
 import org.example.adventurexp.model.Activity;
@@ -27,9 +28,9 @@ public interface IReservationService{
     ReservationResponse createReservation(CreateReservationDTO request);
 
     @Transactional
-    void updateReservation(UpdateReservationRequest req);
+    Reservation updateReservation(UpdateReservationRequest req);
 
     List<Reservation> getDaySchedule(LocalDate date);
   
-    List<Reservation> searchReservation(String string);
+    List<ReservationLookupDTO> searchReservation(String string);
 }

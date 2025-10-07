@@ -1,8 +1,6 @@
 package org.example.adventurexp.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
@@ -13,5 +11,8 @@ public class ActivityDTO {
     private Long id;
     private String name;
     private int minAge;
+    private int minParticipants;
+    private int maxParticipants;
     private int durationMinutes;
+    private int parallelCourts;
 }

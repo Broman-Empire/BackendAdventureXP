@@ -2,8 +2,10 @@ package org.example.adventurexp.service;
 
 import jakarta.transaction.Transactional;
 import org.example.adventurexp.dto.CreateReservationDTO;
+import org.example.adventurexp.dto.ReservationLookupDTO;
 import org.example.adventurexp.dto.ReservationResponse;
 import org.example.adventurexp.dto.UpdateReservationRequest;
+import org.example.adventurexp.mapper.ReservationMapper;
 import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.model.Reservation;
 import org.example.adventurexp.model.TimeSlot;
@@ -303,7 +305,7 @@ public class ReservationServiceImpl implements IReservationService {
 
     @Transactional
     @Override
-    public void updateReservation(UpdateReservationRequest req) {
+    public Reservation updateReservation(UpdateReservationRequest req) {
         if (req == null || req.getReservationId() == null) {
             throw new IllegalArgumentException("Update request and reservation ID are required");
         }
@@ -381,6 +383,7 @@ public class ReservationServiceImpl implements IReservationService {
 
         // Save updated reservation
         iReservationRepository.save(reservation);
+        return reservation;
     }
 
     public List<Reservation> getDaySchedule(LocalDate date) {
@@ -409,25 +412,41 @@ public class ReservationServiceImpl implements IReservationService {
 //    public void deleteReservation(Long reservationId) {
 //    }
 
-    // Søger efter reservationer baseret på telefonnummer.
+    // Søger efter reservation baseret på telefonnummer
     @Override
-    public List<Reservation> searchReservation(String phoneNumber) {
-        // Opret et set for at undgå dubletter
-        Set<Reservation> resultSet = new HashSet<>();
-
-        // Tjek at telefonnummer er angivet
-        if (phoneNumber != null && !phoneNumber.isBlank()) {
-            // Søg på telefonnummer
-            resultSet.addAll(iReservationRepository.findByPhone(phoneNumber));
-        } else {
+    public List<ReservationLookupDTO> searchReservation(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.isBlank()) {
             throw new IllegalArgumentException("Phone number must be provided");
         }
-        
-        // Hvis ingen reservationer findes, kast exception
-        if (resultSet.isEmpty()) {
-            throw new IllegalStateException("No reservation made with this phone number");
+
+        var reservations = iReservationRepository.findByPhone(phoneNumber);
+
+        if (reservations.isEmpty()) {
+            throw new IllegalArgumentException("No reservation made with this phone number");
         }
-        // Returnér listen af reservationer
-        return List.copyOf(resultSet);
+
+        return ReservationMapper.toLookupDTOList(reservations);
     }
+
+//    // Søger efter reservationer baseret på telefonnummer.
+//    @Override
+//    public List<Reservation> searchReservation(String phoneNumber) {
+//        // Opret et set for at undgå dubletter
+//        Set<Reservation> resultSet = new HashSet<>();
+//
+//        // Tjek at telefonnummer er angivet
+//        if (phoneNumber != null && !phoneNumber.isBlank()) {
+//            // Søg på telefonnummer
+//            resultSet.addAll(iReservationRepository.findByPhone(phoneNumber));
+//        } else {
+//            throw new IllegalArgumentException("Phone number must be provided");
+//        }
+//
+//        // Hvis ingen reservationer findes, kast exception
+//        if (resultSet.isEmpty()) {
+//            throw new IllegalStateException("No reservation made with this phone number");
+//        }
+//        // Returnér listen af reservationer
+//        return List.copyOf(resultSet);
+//    }
 }

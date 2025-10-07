@@ -47,7 +47,7 @@ public class EquipmentServiceImpl implements IEquipmentService {
     }
 
     @Override
-    public void addEquipment(long activityId, Equipment equipment) {
+    public Equipment addEquipment(long activityId, Equipment equipment) {
         Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new IllegalArgumentException("Activity not found: " + activityId));
 
         //check for duplicates
@@ -56,14 +56,14 @@ public class EquipmentServiceImpl implements IEquipmentService {
                 .filter(e -> e.getName().equalsIgnoreCase(equipment.getName()))
                 .toList();
         if(!existingEquipment.isEmpty()) {
-            return; // Duplicate found, do not add
+           return existingEquipment.getFirst(); // return existing equipment if duplicate is found
         }
         equipment.setActivity(activity);
-        equipmentRepository.save(equipment);
+        return equipmentRepository.save(equipment);
     }
 
     @Override
-    public void updateEquipment(long equipmentId, Equipment patch) {
+    public Equipment updateEquipment(long equipmentId, Equipment patch) {
         Equipment equipment = equipmentRepository.findById(equipmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Equipment not found: " + equipmentId));
 
@@ -77,6 +77,7 @@ public class EquipmentServiceImpl implements IEquipmentService {
             equipment.setUsableSets(patch.getUsableSets());
         }
         equipmentRepository.save(equipment);
+        return equipment;
     }
 
     @Override

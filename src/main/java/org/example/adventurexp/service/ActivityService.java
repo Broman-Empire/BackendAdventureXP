@@ -1,9 +1,11 @@
 package org.example.adventurexp.service;
 
 import org.example.adventurexp.dto.ActivityDTO;
+import org.example.adventurexp.mapper.ActivityMapper;
 import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.model.TimeSlot;
 import org.example.adventurexp.repository.IActivityRepository;
+import org.example.adventurexp.repository.IBookingRepository;
 import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +20,12 @@ public class ActivityService implements IActivityService {
     //IBookingService bookingService; // TODO Den findes ikke, men skal jo eksistere på et tidspunkt
     IActivityRepository activityRepository;
     ITimeSlotRepository timeSlotRepository;
+    IBookingRepository bookingRepository;
     ISlotService slotService;
 
-    public ActivityService(IActivityRepository activityRepository) {
+    public ActivityService(IActivityRepository activityRepository, IBookingRepository bookingRepository) {
         this.activityRepository = activityRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     @Override
@@ -31,14 +35,10 @@ public class ActivityService implements IActivityService {
         long count = activityRepository.count();
         System.out.println("Antal rækker i activity: " + count);
 
-        return activityRepository.findAll().stream()
-                .map(activity -> new ActivityDTO(
-                        activity.getId(),
-                        activity.getName(),
-                        activity.getMinAge(),
-                        activity.getDurationMinutes()
-                ))
-                .toList();
+        return activityRepository.findAll()
+                .stream()// Laver listen: "pipeline"
+                .map(ActivityMapper::toDTO) // Kalder metode på hvert element i stream'et -> method reference i Java
+                .toList(); // Returnerer DTO'er i en liste
     }
 
     @Override
@@ -60,16 +60,14 @@ public class ActivityService implements IActivityService {
 
     @Override
     public Activity deleteActivity(Long id) {
-//        Activity toBeDeleted = activityRepository.findById(id).orElseThrow();
-//        for (Booking booking : bookingService.findAll()) {
-//            if (booking.getActivity().getId().equals(id)) {
-//                // TODO Vi skal lige finde ud af, hvad vi præcis smider, hvis aktiviteten faktisk har bookinger ved sletning
-//                throw new IllegalArgumentException("Cannot delete activity with existing bookings");
-//            }
-//        }
-//        activityRepository.delete(toBeDeleted);
-//        return toBeDeleted;
-        return null;
+        Activity toBeDeleted = activityRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Activity not found: " + id));
+
+        long bookingCount = bookingRepository.countByActivityId(id);
+        if (bookingCount > 0) {
+            throw new IllegalArgumentException("Cannot delete activity with existing bookings");
+        }
+        activityRepository.delete(toBeDeleted);
+        return toBeDeleted;
     }
 
     public void regenerateFutureSlots(Long activityId, LocalDate fromDate) {
