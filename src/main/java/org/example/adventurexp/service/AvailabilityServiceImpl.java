@@ -59,10 +59,7 @@ public class AvailabilityServiceImpl implements IAvailabilityService {
         return availableSlots.toArray(new AvailabilityDTO[0]);
     }
 
-    /**
-     * Beregner antal ledige pladser for en aktivitet i et givent slot.
-     * TODO: Eftertjek metoden når TimeSlot-klassen er færdig og integreret.
-     */
+
     @Override
     public int computeRemaining(TimeSlot slot, Activity activity) {
         if (slot == null || activity == null) return 0; // Returnér 0 hvis slot eller aktivitet mangler

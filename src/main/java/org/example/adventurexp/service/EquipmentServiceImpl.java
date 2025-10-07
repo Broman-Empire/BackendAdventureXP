@@ -3,6 +3,7 @@ package org.example.adventurexp.service;
 import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.model.Equipment;
 import org.example.adventurexp.repository.IActivityRepository;
+import org.example.adventurexp.repository.IBookingRepository;
 import org.example.adventurexp.repository.IEquipmentRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +15,13 @@ import static java.util.Arrays.stream;
 public class EquipmentServiceImpl implements IEquipmentService {
 
     private final IEquipmentRepository equipmentRepository;
-    private final IActivityRepository activityRepository; // Assuming you have an ActivityRepository
+    private final IActivityRepository activityRepository;
+    private final IBookingRepository bookingRepository;
 
-    public EquipmentServiceImpl(IEquipmentRepository equipmentRepository, IActivityRepository activityRepository) {
+    public EquipmentServiceImpl(IEquipmentRepository equipmentRepository, IActivityRepository activityRepository, IBookingRepository bookingRepository) {
         this.equipmentRepository = equipmentRepository;
         this.activityRepository = activityRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     // Implements interface method
@@ -57,5 +60,34 @@ public class EquipmentServiceImpl implements IEquipmentService {
         }
         equipment.setActivity(activity);
         equipmentRepository.save(equipment);
+    }
+
+    @Override
+    public void updateEquipment(long equipmentId, Equipment patch) {
+        Equipment equipment = equipmentRepository.findById(equipmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Equipment not found: " + equipmentId));
+
+        if(patch.getName() != null) {
+            equipment.setName(patch.getName());
+        }
+        if(patch.getTotalSets() != 0) {
+            equipment.setTotalSets(patch.getTotalSets());
+        }
+        if(patch.getUsableSets() != 0) {
+            equipment.setUsableSets(patch.getUsableSets());
+        }
+        equipmentRepository.save(equipment);
+    }
+
+    @Override
+    public void deleteEquipment(long equipmentId) {
+        Equipment equipment = equipmentRepository.findById(equipmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Equipment not found: " + equipmentId));
+        long activityId = equipment.getActivity().getId();
+
+        if(bookingRepository.existsByActivity_Id(activityId)) {
+            throw new IllegalArgumentException("Cannot delete equipment: There are bookings associated with this activity.");
+        }
+        equipmentRepository.deleteById(equipmentId);
     }
 }
