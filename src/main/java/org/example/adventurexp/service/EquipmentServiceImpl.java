@@ -63,7 +63,7 @@ public class EquipmentServiceImpl implements IEquipmentService {
     }
 
     @Override
-    public void updateEquipment(long equipmentId, Equipment patch) {
+    public Equipment updateEquipment(long equipmentId, Equipment patch) {
         Equipment equipment = equipmentRepository.findById(equipmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Equipment not found: " + equipmentId));
 
@@ -77,6 +77,7 @@ public class EquipmentServiceImpl implements IEquipmentService {
             equipment.setUsableSets(patch.getUsableSets());
         }
         equipmentRepository.save(equipment);
+        return equipment;
     }
 
     @Override

@@ -62,12 +62,11 @@ public class AdminController {
         return equipmentService.listByActivity(activityId);
     }
 
-    // TODO: refactor updateEquipment til en 'Equipment' fra 'void' før brug (afkommenteres efter det)
-//    // PATCH /api/admin/equipment/{id}
-//    @PatchMapping("/equipment/{id}")
-//    public Equipment updateEquipment(@PathVariable("id") Long id, @RequestBody Equipment patch) {
-//        return equipmentService.updateEquipment(id, patch);
-//    }
+    // PATCH /api/admin/equipment/{id}
+    @PatchMapping("/equipment/{id}")
+    public Equipment updateEquipment(@PathVariable("id") Long id, @RequestBody Equipment patch) {
+        return equipmentService.updateEquipment(id, patch);
+    }
 
     @DeleteMapping("/equipment/{id}")
     public ResponseEntity<Void> deleteEquipment(@PathVariable("id") Long id) {

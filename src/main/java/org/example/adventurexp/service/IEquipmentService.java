@@ -18,7 +18,7 @@ public interface IEquipmentService {
 
     void addEquipment(long activityId, Equipment equipment);
 
-    void updateEquipment(long equipmentId, Equipment patch);
+    Equipment updateEquipment(long equipmentId, Equipment patch);
 
     void deleteEquipment(long equipmentId);
 }
