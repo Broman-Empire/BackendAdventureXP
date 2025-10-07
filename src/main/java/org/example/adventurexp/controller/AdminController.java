@@ -1,5 +1,6 @@
 package org.example.adventurexp.controller;
 
+import org.example.adventurexp.dto.UpdateReservationRequest;
 import org.example.adventurexp.model.Reservation;
 import org.example.adventurexp.service.IReservationService;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,12 @@ public class AdminController {
     public ResponseEntity<Void> deleteReservation(@PathVariable("id") Long id) {
         reservationService.cancelReservation(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/reservations/{id}")
+    public Reservation updateReservation(@PathVariable("id") Long id, @RequestBody UpdateReservationRequest updateRequest) {
+        updateRequest.setReservationId(id);
+        return reservationService.updateReservation(updateRequest);
     }
 
 }
