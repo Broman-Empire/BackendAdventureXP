@@ -1,5 +1,8 @@
 -- Opretter testdata til AdventureXP
 
+-- Deaktiverer referentiel integritet midlertidigt for at undgå problemer med fremmednøgler
+SET REFERENTIAL_INTEGRITY FALSE;
+
 -- Opret aktiviteter
 INSERT INTO activity (name, min_age, min_participants, max_participants, duration_minutes, parallel_courts)
 VALUES
@@ -7,6 +10,10 @@ VALUES
     ('Paintball', 16, 4, 20, 90, 2),
     ('Minigolf', 6, 1, 6, 60, 4),
     ('Sumo Wrestling', 10, 2, 4, 30, 1);
+
+-- Restarter id-sekvensen for aktiviteter, så Hibernate ikke opretter med id = 1 igen
+ALTER TABLE activity ALTER COLUMN id RESTART WITH 5;
+
 -- Udstyr til aktiviteter
 INSERT INTO equipment (name, total_sets, usable_sets, activity_id)
 VALUES
@@ -14,6 +21,9 @@ VALUES
     ('Paintball sæt', 20, 18, 2),
     ('Minigolf sæt', 24, 24, 3),
     ('Sumo sæt', 4, 4, 4);
+
+ALTER TABLE equipment ALTER COLUMN id RESTART WITH 5;
+
 -- Tidsrum (TimeSlots)
 INSERT INTO time_slot (starts_at, ends_at, court, activity_id, capacity)
 VALUES
@@ -22,14 +32,23 @@ VALUES
     ('2025-10-05 12:00:00', '2025-10-05 13:00:00', 1, 2, 6),
     ('2025-10-05 14:00:00', '2025-10-05 14:45:00', 1, 3, 8);
 
+ALTER TABLE time_slot ALTER COLUMN id RESTART WITH 5;
+
 -- Reservationer (kunder)
 INSERT INTO reservation (customer_type, contact_name, email, phone, created_at)
 VALUES
     ('Private', 'Sofie Hansen', 'sofie@example.com', '12345678', NOW()),
     ('Business', 'Adventure ApS', 'kontakt@adventure.dk', '87654321', NOW());
 
+ALTER TABLE reservation ALTER COLUMN id RESTART WITH 3;
+
 -- Bookinger knytter reservationer, aktiviteter og slots sammen
 INSERT INTO booking (activity_id, participants, timeslot_id, reservation_id)
 VALUES
     (1, 6, 1, 1),
     (2, 4, 3, 2);
+
+ALTER TABLE booking ALTER COLUMN id RESTART WITH 3;
+
+-- Reaktiverer referentiel integritet
+SET REFERENTIAL_INTEGRITY TRUE;
