@@ -11,7 +11,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-class IActivityRepositoryTest {
+class IActivityRepositoryIT { // IT står for Integration Test
 
     @Autowired
     private IActivityRepository activityRepository;

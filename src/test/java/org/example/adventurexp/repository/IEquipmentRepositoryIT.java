@@ -12,13 +12,13 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-class EquipmentRepositoryIT {
+class IEquipmentRepositoryIT { // IT står for Integration Test
 
     @Autowired
     private IEquipmentRepository equipmentRepository;
 
     @Test
-    @DisplayName("Test af findById(Long id)")
+    @DisplayName("Find equipment by ID")
     void testFindById() {
         // Arrange
         long equipmentId = 1L; // Gokart sæt from import.sql
@@ -35,7 +35,7 @@ class EquipmentRepositoryIT {
     }
 
     @Test
-    @DisplayName("Test af findByActivityId(Long activityId)")
+    @DisplayName("Find equipment by activity ID")
     void testFindByActivityId() {
         // Arrange
         long activityId = 1L; // Gokart activity
@@ -49,7 +49,7 @@ class EquipmentRepositoryIT {
     }
 
     @Test
-    @DisplayName("Test af save(Equipment equipment)")
+    @DisplayName("Save new equipment")
     void testSaveEquipment() {
         // Arrange
         long minigolfActivityId = 3L; // Minigolf
@@ -72,7 +72,7 @@ class EquipmentRepositoryIT {
     }
 
     @Test
-    @DisplayName("Test af deleteById(Long id)")
+    @DisplayName("Delete equipment by ID")
     void testDeleteEquipment() {
         // Arrange
         long equipmentId = 1L; // Gokart sæt
