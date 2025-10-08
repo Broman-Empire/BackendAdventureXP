@@ -144,14 +144,15 @@ class ActivityServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> activityService.deleteActivity(activityId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Cannot delete activity with existing bookings");
+                .isInstanceOf(IllegalArgumentException.class) // Jf. den exception der kastes i ActivityService
+                .hasMessageContaining("Cannot delete activity with existing bookings"); // Jf. den besked der kastes i ActivityService
 
         verify(activityRepository, times(1)).findById(activityId); // Tjekker at findById() blev kaldt 1 gang
-        verify(bookingRepository, times(1)).countByActivityId(activityId); // Tjekker at countByActivityId() blev kald
+        verify(bookingRepository, times(1)).countByActivityId(activityId); // Tjekker at countByActivityId() blev kaldt 1 gang
     }
 
     @Test
     void regenerateFutureSlots() {
+
     }
 }
