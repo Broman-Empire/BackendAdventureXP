@@ -12,6 +12,8 @@ public interface ISlotService {
     // aktivitetens varighed, antal baner samt antal deltagere for hvert slot inden for åbningstiden
     List<TimeSlot> generateSlots(Long activityId, LocalDate fromDate, LocalDate toDate, LocalTime openTime, LocalTime closeTime);
 
+    void generateDefaultSlotsForActivity(Long activityId);
+
 }
 
 
