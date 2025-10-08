@@ -76,6 +76,8 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+    // --- Reservation CRUD ---
+
     @GetMapping("/schedule")
     public List<Reservation> getDailySchedule(@RequestParam("date")LocalDate date) {
         return reservationService.getDaySchedule(date);
@@ -99,6 +101,11 @@ public class AdminController {
 
         List<ReservationLookupDTO> result = reservationService.searchReservation(phoneNumber);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/reservations")
+    public List<ReservationLookupDTO> getReservationByDate(@RequestParam(required = false) LocalDate date) {
+        return reservationService.getReservationsByDate(date);
     }
 
 }
