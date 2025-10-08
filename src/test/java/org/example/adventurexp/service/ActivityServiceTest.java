@@ -150,9 +150,4 @@ class ActivityServiceTest {
         verify(activityRepository, times(1)).findById(activityId); // Tjekker at findById() blev kaldt 1 gang
         verify(bookingRepository, times(1)).countByActivityId(activityId); // Tjekker at countByActivityId() blev kaldt 1 gang
     }
-
-    @Test
-    void regenerateFutureSlots() {
-
-    }
 }

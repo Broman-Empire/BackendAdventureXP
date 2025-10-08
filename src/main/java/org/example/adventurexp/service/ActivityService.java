@@ -69,7 +69,7 @@ public class ActivityService implements IActivityService {
         Activity updatedActivity = activityRepository.save(toBeUpdated);
 
         // Regenererer fremtidige tidsslots
-        regenerateFutureSlots(updatedActivity.getId(), LocalDate.now());
+        slotService.regenerateFutureSlots(updatedActivity.getId(), LocalDate.now());
 
         return updatedActivity;
     }
@@ -84,22 +84,6 @@ public class ActivityService implements IActivityService {
         }
         activityRepository.delete(toBeDeleted);
         return toBeDeleted;
-    }
-
-    public void regenerateFutureSlots(Long activityId, LocalDate fromDate) {
-        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new IllegalArgumentException("Activity not found: " + activityId));
-
-        // Delete existing slots from 'fromDate' onwards
-        LocalDateTime fromDateTime = fromDate.atStartOfDay();
-        List<TimeSlot> slotsToDelete = timeSlotRepository.findByActivityAndStartsAtAfter(activity, fromDateTime);
-        timeSlotRepository.deleteAll(slotsToDelete);
-
-        // Regenerate slots (daily from 08 to 22)
-        LocalDate toDate = fromDate.plusDays(30); // Regenerate slots for the next 30 days
-        LocalTime openTime = LocalTime.of(8, 0); // opens at 08:00
-        LocalTime closeTime = LocalTime.of(22, 0); // closes at 22:00
-
-        slotService.generateSlots(activityId, fromDate, toDate, openTime, closeTime);
     }
 
 }
