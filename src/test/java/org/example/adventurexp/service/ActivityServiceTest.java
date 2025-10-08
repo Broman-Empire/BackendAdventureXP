@@ -86,7 +86,28 @@ class ActivityServiceTest {
     }
 
     @Test
+    @DisplayName("Test af updateActivity(Long id, Activity activity)")
     void updateActivity() {
+        // Arrange
+        Long activityId = 1L;
+        Activity existingActivity = new Activity(activityId, "Gokart", 12, 1, 12, 15, 5);
+        Activity updatedActivity = new Activity(activityId, "Gokart", 12, 1, 10, 15, 6);
+
+        // Når vi kalder findById() med activityId, så returnerer vi existingActivity
+        when(activityRepository.findById(activityId)).thenReturn(Optional.of(existingActivity));
+        // Når vi kalder save() med en vilkårlig Activity-instans, så returnerer vi updatedActivity
+        when(activityRepository.save(any(Activity.class))).thenReturn(updatedActivity);
+
+        // Act
+        Activity result = activityService.updateActivity(activityId, updatedActivity);
+
+        // Assert
+        assertThat(result.getMaxParticipants()).isEqualTo(10); // Tjekker at maxParticipants er sat ned til 10
+        assertThat(result.getParallelCourts()).isEqualTo(6); // Tjekker at parallelCourts er sat op til 6
+        verify(activityRepository, times(2)).findById(activityId); // Tjekker at findById() blev kaldt 2 gange (1 i updateActivity og 1 i regenerateFutureSlots)
+        verify(activityRepository, times(1)).save(any(Activity.class)); // Tjekker at save() blev kaldt 1 gang
+        // regenerateFutureSlots ligger i ActivityService og ikke i SlotService :thinko:
+        //verify(activityService, times(1)).regenerateFutureSlots(activityId, LocalDate.now()); // Tjekker at fremtidige slots blev genereret
     }
 
     @Test
