@@ -33,4 +33,6 @@ public interface IReservationService{
     List<Reservation> getDaySchedule(LocalDate date);
   
     List<ReservationLookupDTO> searchReservation(String string);
+
+    void deleteReservation(Long reservationId);
 }

@@ -23,9 +23,14 @@ public class ActivityService implements IActivityService {
     IBookingRepository bookingRepository;
     ISlotService slotService;
 
-    public ActivityService(IActivityRepository activityRepository, IBookingRepository bookingRepository) {
+    public ActivityService(IActivityRepository activityRepository,
+                           ITimeSlotRepository timeSlotRepository,
+                           IBookingRepository bookingRepository,
+                           ISlotService slotService) {
         this.activityRepository = activityRepository;
+        this.timeSlotRepository = timeSlotRepository;
         this.bookingRepository = bookingRepository;
+        this.slotService = slotService;
     }
 
     @Override
@@ -43,7 +48,12 @@ public class ActivityService implements IActivityService {
 
     @Override
     public Activity createActivity(Activity activity) {
-        return activityRepository.save(activity);
+        Activity newActivity = activityRepository.save(activity);
+
+        // Default slotsgenerering for en ny aktivitet
+        slotService.generateDefaultSlotsForActivity(activity.getId());
+
+        return newActivity;
     }
 
     @Override
@@ -55,7 +65,13 @@ public class ActivityService implements IActivityService {
         toBeUpdated.setMaxParticipants(activity.getMaxParticipants());
         toBeUpdated.setDurationMinutes(activity.getDurationMinutes());
         toBeUpdated.setParallelCourts(activity.getParallelCourts());
-        return activityRepository.save(toBeUpdated);
+
+        Activity updatedActivity = activityRepository.save(toBeUpdated);
+
+        // Regenererer fremtidige tidsslots
+        regenerateFutureSlots(updatedActivity.getId(), LocalDate.now());
+
+        return updatedActivity;
     }
 
     @Override

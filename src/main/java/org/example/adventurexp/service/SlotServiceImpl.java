@@ -28,6 +28,19 @@ public class SlotServiceImpl implements ISlotService {
     // ---- Opretter tidsrum (slots) for en given aktivitet (hvis den oprettes/ændres) ud fra:
     // aktivitetens varighed (duration), antal baner (parallelCourts)
     // samt antal deltagere (capacity) for hvert slot inden for åbningstiden
+
+    @Override
+    public void generateDefaultSlotsForActivity(Long activityId) {
+        LocalDate fromDate = LocalDate.now();
+        LocalDate toDate = fromDate.plusDays(30);
+        LocalTime openTime = LocalTime.of(8, 0);
+        LocalTime closeTime = LocalTime.of(22, 0);
+
+        generateSlots(activityId, fromDate, toDate, openTime, closeTime);
+
+    }
+
+    //
     @Override
     public List<TimeSlot> generateSlots(Long activityId, LocalDate fromDate, LocalDate toDate, LocalTime openTime, LocalTime closeTime) {
 
@@ -71,7 +84,8 @@ public class SlotServiceImpl implements ISlotService {
     }
 
 
-   // ---- Hjælpemetode ----
+
+    // ---- Hjælpemetode ----
 // Opretter et slot, hvis der ikke allerede findes et slot med samme starttidspunkt og bane (activityId + start + court = unik)
     public void createIfNotExists(Long activityId, LocalDateTime start, LocalDateTime end, int capacity, int court) {
 

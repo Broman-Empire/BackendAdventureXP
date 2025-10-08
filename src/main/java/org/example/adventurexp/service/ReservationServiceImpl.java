@@ -1,5 +1,6 @@
 package org.example.adventurexp.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.example.adventurexp.dto.CreateReservationDTO;
 import org.example.adventurexp.dto.ReservationLookupDTO;
@@ -408,9 +409,14 @@ public class ReservationServiceImpl implements IReservationService {
         return new ArrayList<>(orderedUnique.values());
     }
 
-//    @Override
-//    public void deleteReservation(Long reservationId) {
-//    }
+    // Slet en reservation ud fra id
+    @Override
+    public void deleteReservation(Long reservationId) {
+        if (!iReservationRepository.existsById(reservationId)) {
+            throw new EntityNotFoundException("Reservation not found");
+        }
+        iReservationRepository.deleteById(reservationId);
+    }
 
     // Søger efter reservation baseret på telefonnummer
     @Override
