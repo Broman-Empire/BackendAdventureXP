@@ -14,6 +14,7 @@ import java.util.List;
 
 public interface IReservationService{
 
+    ReservationResponse getReservationById(Long id);
 
     /**
      * Summerer antal deltagere som allerede er booket for en given aktivitet i et specifikt timeslot.
