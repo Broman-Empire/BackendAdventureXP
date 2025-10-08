@@ -34,4 +34,6 @@ public interface IReservationService{
     List<ReservationLookupDTO> searchReservation(String string);
 
     void deleteReservation(Long reservationId);
+
+    List<ReservationLookupDTO> getReservationsByDate(LocalDate date);
 }

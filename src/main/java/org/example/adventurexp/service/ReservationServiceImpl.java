@@ -405,25 +405,17 @@ public class ReservationServiceImpl implements IReservationService {
         return ReservationMapper.toLookupDTOList(reservations);
     }
 
-//    // Søger efter reservationer baseret på telefonnummer.
-//    @Override
-//    public List<Reservation> searchReservation(String phoneNumber) {
-//        // Opret et set for at undgå dubletter
-//        Set<Reservation> resultSet = new HashSet<>();
-//
-//        // Tjek at telefonnummer er angivet
-//        if (phoneNumber != null && !phoneNumber.isBlank()) {
-//            // Søg på telefonnummer
-//            resultSet.addAll(iReservationRepository.findByPhone(phoneNumber));
-//        } else {
-//            throw new IllegalArgumentException("Phone number must be provided");
-//        }
-//
-//        // Hvis ingen reservationer findes, kast exception
-//        if (resultSet.isEmpty()) {
-//            throw new IllegalStateException("No reservation made with this phone number");
-//        }
-//        // Returnér listen af reservationer
-//        return List.copyOf(resultSet);
-//    }
+    @Override
+    public List<ReservationLookupDTO> getReservationsByDate(LocalDate date) {
+        List<Reservation> reservations;
+
+        if (date == null) {
+            reservations = iReservationRepository.findAll();
+        } else {
+            reservations = iReservationRepository.findByBookingDate(date);
+        }
+
+        return reservations.stream().map(ReservationMapper::toLookupDTO).toList();
+    }
+
 }
