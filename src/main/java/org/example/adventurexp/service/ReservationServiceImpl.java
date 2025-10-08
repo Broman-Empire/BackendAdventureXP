@@ -399,7 +399,7 @@ public class ReservationServiceImpl implements IReservationService {
         var reservations = iReservationRepository.findByPhone(phoneNumber);
 
         if (reservations.isEmpty()) {
-            throw new IllegalArgumentException("No reservation made with this phone number");
+            throw new EntityNotFoundException("No reservation made with this phone number: " + phoneNumber);
         }
 
         return ReservationMapper.toLookupDTOList(reservations);
