@@ -66,19 +66,21 @@ class ActivityServiceTest {
     @DisplayName("Test af createActivity(Activity activity)")
     void createActivity() {
         // Arrange
-        Activity newActivity = new Activity(null, "Batting cage", 12, 1, 2, 60, 4);
+        // Siden vi ikke rigtig har noget Hibernate med her, så kan den ikke finde ud af, at generere ID korrekt
+        //Activity newActivity = new Activity(null, "Batting cage", 12, 1, 2, 60, 4);
         Activity savedActivity = new Activity(5L, "Batting cage", 12, 1, 2, 60, 4);
 
         // Når vi kalder save() på repository'et med newActivity, så returnerer vi savedActivity
-        when(activityRepository.save(newActivity)).thenReturn(savedActivity);
+        when(activityRepository.save(savedActivity)).thenReturn(savedActivity);
 
         // Act
-        Activity result = activityService.createActivity(newActivity);
+        Activity result = activityService.createActivity(savedActivity);
 
         // Assert
         assertThat(result.getId()).isNotNull(); // Tjekker at ID ikke er null
-        assertThat(result.getName()).isEqualTo("Batting cage"); // Tjekker navn
-        verify(activityRepository, times(1)).save(newActivity); // Tjekker at save() blev kaldt 1 gang med newActivity
+        assertThat(result.getName()).isEqualTo("Batting cage"); // Tjekker navn på aktiviteten
+        verify(activityRepository, times(1)).save(savedActivity); // Tjekker at save() blev kaldt 1 gang med newActivity
+        // Hernede lavede den ballade når jeg kørte dobbelt med newActivity og savedActivity, da den jo ikke genererede et nyt ID til den nye Activity
         verify(slotService, times(1)).generateDefaultSlotsForActivity(savedActivity.getId()); // Tjekker at slots blev genereret
 
     }
