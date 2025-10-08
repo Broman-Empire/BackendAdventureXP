@@ -111,7 +111,44 @@ class ActivityServiceTest {
     }
 
     @Test
-    void deleteActivity() {
+    @DisplayName("Test af deleteActivity(Long id) - succes")
+    void deleteActivityNoBookings() {
+        // Arrange
+        Long activityId = 1L;
+        Activity existingActivity = new Activity(activityId, "Gokart", 12, 1, 12, 15, 5);
+
+        // Når vi kalder findById() med activityId, så returnerer vi existingActivity
+        when(activityRepository.findById(activityId)).thenReturn(Optional.of(existingActivity));
+        // Når vi kalder countByActivityId() med activityId, så returnerer vi 0
+        when(bookingRepository.countByActivityId(activityId)).thenReturn(0L);
+
+        // Act
+        Activity result = activityService.deleteActivity(activityId);
+
+        // Assert
+        assertThat(result.getId()).isEqualTo(activityId); // Tjekker at den returnerede aktivitet har det rigtige ID
+        verify(activityRepository, times(1)).findById(activityId); // Tjekker at findById() blev kaldt 1 gang
+        verify(bookingRepository, times(1)).countByActivityId(activityId); // Tjekker at countByActivityId() blev kald
+    }
+
+    @Test
+    void deleteActivityWithBookings() {
+    // Arrange
+        Long activityId = 1L;
+        Activity existingActivity = new Activity(activityId, "Gokart", 12, 1, 12, 15, 5);
+
+        // Når vi kalder findById() med activityId, så returnerer vi existingActivity
+        when(activityRepository.findById(activityId)).thenReturn(Optional.of(existingActivity));
+        // Når vi kalder countByActivityId() med activityId, så returnerer vi 5 (simulerer at der er eksisterende bookinger)
+        when(bookingRepository.countByActivityId(activityId)).thenReturn(5L);
+
+        // Act & Assert
+        assertThatThrownBy(() -> activityService.deleteActivity(activityId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Cannot delete activity with existing bookings");
+
+        verify(activityRepository, times(1)).findById(activityId); // Tjekker at findById() blev kaldt 1 gang
+        verify(bookingRepository, times(1)).countByActivityId(activityId); // Tjekker at countByActivityId() blev kald
     }
 
     @Test
