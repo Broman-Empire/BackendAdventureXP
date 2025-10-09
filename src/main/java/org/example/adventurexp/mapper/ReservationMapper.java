@@ -2,6 +2,7 @@ package org.example.adventurexp.mapper;
 
 import org.example.adventurexp.dto.BookingSummaryDTO;
 import org.example.adventurexp.dto.ReservationLookupDTO;
+import org.example.adventurexp.dto.ReservationResponse;
 import org.example.adventurexp.model.Booking;
 import org.example.adventurexp.model.Reservation;
 import org.example.adventurexp.model.TimeSlot;
@@ -50,5 +51,16 @@ public class ReservationMapper {
         return reservations.stream()
                 .map(ReservationMapper::toLookupDTO)
                 .collect(Collectors.toList());
+    }
+
+    public static ReservationResponse toReservationResponse(Reservation reservation, Long activityId, Long participants, TimeSlot slot) {
+        if (reservation == null) return null;
+
+        return new ReservationResponse(
+                reservation.getId(),
+                activityId,
+                participants,
+                slot.getStartsAt()
+        );
     }
 }

@@ -1,8 +1,6 @@
 package org.example.adventurexp.controller;
 
-import org.example.adventurexp.dto.ReservationLookupDTO;
-import org.example.adventurexp.dto.ActivityDTO;
-import org.example.adventurexp.dto.UpdateReservationRequest;
+import org.example.adventurexp.dto.*;
 import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.model.Equipment;
 import org.example.adventurexp.model.Reservation;
@@ -23,7 +21,7 @@ public class AdminController {
     private final IActivityService activityService;
     private final IEquipmentService equipmentService;
 
-    public AdminController (IReservationService reservationService, IActivityService activityService, IEquipmentService equipmentService) {
+    public AdminController(IReservationService reservationService, IActivityService activityService, IEquipmentService equipmentService) {
         this.reservationService = reservationService;
         this.activityService = activityService;
         this.equipmentService = equipmentService;
@@ -45,8 +43,9 @@ public class AdminController {
 
     // PATCH /api/admin/activities/{id}
     @PatchMapping("/activities/{id}")
-    public Activity updateActivity(@PathVariable("id") Long id, @RequestBody Activity patch) {
-        return activityService.updateActivity(id, patch);
+    public ResponseEntity<Activity> updateActivity(@PathVariable("id") Long id, @RequestBody Activity patch) {
+        Activity updated = activityService.updateActivity(id, patch);
+        return ResponseEntity.ok(updated); // returnerer 200 + JSON
     }
 
     // DELETE /api/admin/activities/{id}
@@ -79,25 +78,13 @@ public class AdminController {
     // --- Reservation CRUD ---
 
     @GetMapping("/schedule")
-    public List<Reservation> getDailySchedule(@RequestParam("date")LocalDate date) {
+    public List<BookingScheduleDTO> getDailySchedule(@RequestParam("date") LocalDate date) {
         return reservationService.getDaySchedule(date);
     }
 
-    @DeleteMapping("/reservations/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable("id") Long id) {
-        reservationService.cancelReservation(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/reservations/{id}")
-    public Reservation updateReservation(@PathVariable("id") Long id, @RequestBody UpdateReservationRequest updateRequest) {
-        updateRequest.setReservationId(id);
-        return reservationService.updateReservation(updateRequest);
-    }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ReservationLookupDTO>> searchReservation(
-            @RequestParam("phone") String phoneNumber) {
+    public ResponseEntity<List<ReservationLookupDTO>> searchReservation(@RequestParam("phone") String phoneNumber) {
 
         List<ReservationLookupDTO> result = reservationService.searchReservation(phoneNumber);
         return ResponseEntity.ok(result);
@@ -108,4 +95,17 @@ public class AdminController {
         return reservationService.getReservationsByDate(date);
     }
 
+    @PatchMapping("/reservations/{id}")
+    public ResponseEntity<ReservationResponse> patchReservation(@PathVariable Long id,
+                                                                @RequestBody UpdateReservationRequest request) {
+        ReservationResponse response = reservationService.updateReservation(request, id);
+        return ResponseEntity.ok(response);
+    }
+
+
+    @DeleteMapping("/reservations/{id}")
+    public ResponseEntity<Void> deleteReservation(@PathVariable("id") Long id) {
+        reservationService.cancelReservation(id);
+        return ResponseEntity.noContent().build();
+    }
 }

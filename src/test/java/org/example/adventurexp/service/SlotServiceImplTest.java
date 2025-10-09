@@ -5,10 +5,12 @@ import org.example.adventurexp.model.TimeSlot;
 import org.example.adventurexp.repository.IActivityRepository;
 import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
 
@@ -40,8 +42,8 @@ public class SlotServiceImplTest {
         when(activityRepository.findById(1L)).thenReturn(Optional.of(activity));
 
         LocalDate fromDate = LocalDate.of(2025, 10, 1);
-        LocalDate toDate   = LocalDate.of(2025, 10, 1); // én dag
-        LocalTime openTime  = LocalTime.of(10, 0);
+        LocalDate toDate = LocalDate.of(2025, 10, 1); // én dag
+        LocalTime openTime = LocalTime.of(10, 0);
         LocalTime closeTime = LocalTime.of(14, 0);
 
         // Act
@@ -60,5 +62,28 @@ public class SlotServiceImplTest {
         // Sidste slot slutter 14:00
         assertThat(slotCaptor.getAllValues().get(7).getEndsAt().toLocalTime())
                 .isEqualTo(LocalTime.of(14, 0));
+    }
+
+    @Test
+    @DisplayName("Test af regenerateFutureSlots(Long activityId, LocalDate fromDate)")
+    void testRegenerateFutureSlots() {
+        // Arrange
+        Long activityId = 1L;
+        LocalDate fromDate = LocalDate.now().plusDays(1);
+
+        Activity activity = new Activity();
+        activity.setId(activityId);
+        activity.setDurationMinutes(60);
+        activity.setMaxParticipants(10);
+        activity.setParallelCourts(2);
+
+        when(activityRepository.findById(activityId)).thenReturn(Optional.of(activity));
+
+        // Act
+        slotServiceImpl.regenerateFutureSlots(activityId, fromDate);
+
+        // Assert
+        verify(timeSlotRepository, times(1)).findByActivityAndStartsAtAfter(any(Activity.class), any(LocalDateTime.class));
+        verify(timeSlotRepository, times(1)).deleteAll(anyList());
     }
 }
