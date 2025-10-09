@@ -2,6 +2,7 @@ package org.example.adventurexp.controller;
 
 import org.example.adventurexp.dto.ReservationLookupDTO;
 import org.example.adventurexp.dto.ActivityDTO;
+import org.example.adventurexp.dto.ReservationResponse;
 import org.example.adventurexp.dto.UpdateReservationRequest;
 import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.model.Equipment;
@@ -78,11 +79,12 @@ public class AdminController {
 
     // --- Reservation CRUD ---
 
-//    // TODO: bruges denne?
-//    @GetMapping("/schedule")
-//    public List<Reservation> getDailySchedule(@RequestParam("date")LocalDate date) {
-//        return reservationService.getDaySchedule(date);
-//    }
+    @GetMapping("/schedule")
+    public List<Reservation> getDailySchedule(@RequestParam("date")LocalDate date) {
+        return reservationService.getDaySchedule(date);
+    }
+
+
 
     @GetMapping("/search")
     public ResponseEntity<List<ReservationLookupDTO>> searchReservation(@RequestParam("phone") String phoneNumber) {
@@ -96,9 +98,8 @@ public class AdminController {
         return reservationService.getReservationsByDate(date);
     }
 
-
     @PatchMapping("/reservations/{id}")
-    public Reservation updateReservation(@PathVariable("id") Long id, @RequestBody UpdateReservationRequest updateRequest) {
+    public ReservationResponse updateReservation(@PathVariable("id") Long id, @RequestBody UpdateReservationRequest updateRequest) {
         updateRequest.setReservationId(id);
         return reservationService.updateReservation(updateRequest);
     }
@@ -109,10 +110,4 @@ public class AdminController {
         reservationService.cancelReservation(id);
         return ResponseEntity.noContent().build();
     }
-
-
-
-
-}
-
-
+    }

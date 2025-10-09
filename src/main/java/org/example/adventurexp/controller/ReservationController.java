@@ -2,6 +2,7 @@ package org.example.adventurexp.controller;
 
 import org.example.adventurexp.dto.CreateReservationDTO;
 import org.example.adventurexp.dto.ReservationResponse;
+import org.example.adventurexp.dto.UpdateReservationRequest;
 import org.example.adventurexp.service.IReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,5 +36,11 @@ public class ReservationController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping("reservations/{id}")
+    public ResponseEntity<ReservationResponse> patchReservation(@PathVariable Long reservationId,
+                                                                @RequestBody UpdateReservationRequest request) {
+        ReservationResponse response = reservationService.updateReservation(request);
+        return ResponseEntity.ok(response);
+    }
 
 }
