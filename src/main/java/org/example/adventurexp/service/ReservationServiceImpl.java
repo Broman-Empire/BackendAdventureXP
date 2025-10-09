@@ -53,7 +53,7 @@ public class ReservationServiceImpl implements IReservationService {
 
         // handle empty bookings
         if (reservation.getBookings() == null || reservation.getBookings().isEmpty()) {
-            return new ReservationResponse(reservation.getId(), null, 0L, 0L, null);
+            return new ReservationResponse(reservation.getId(), null, 0L, null);
         }
         // use first booking to fetch activityId, participants, startsAt
         Booking firstBooking = reservation.getBookings().getFirst();
@@ -70,7 +70,7 @@ public class ReservationServiceImpl implements IReservationService {
                 reservation.getId(),
                 activityId,
                 participants,
-                totalParticipants,
+        //        totalParticipants,
                 startsAt
         );
     }
@@ -267,7 +267,6 @@ public class ReservationServiceImpl implements IReservationService {
                 reservation.getId(),
                 activity.getId(),
                 (long) booking.getParticipants(),
-                (long) booking.getParticipants(),
                 slot.getStartsAt()
         );
     }
@@ -275,6 +274,7 @@ public class ReservationServiceImpl implements IReservationService {
     /**
      * Applies capacity changes when creating a new booking.
      * Since we calculate reservedCount dynamically, this method is primarily for validation.
+     *
      * @param booking The booking item being created
      */
     private void applyCapacityOnCreate(Booking booking) {
@@ -306,7 +306,7 @@ public class ReservationServiceImpl implements IReservationService {
 
     @Transactional
     @Override
-    public Reservation updateReservation(UpdateReservationRequest req) {
+    public ReservationResponse updateReservation(UpdateReservationRequest req) {
         if (req == null || req.getReservationId() == null) {
             throw new IllegalArgumentException("Update request and reservation ID are required");
         }
@@ -342,7 +342,7 @@ public class ReservationServiceImpl implements IReservationService {
             // Fetch new activity if changed
             Activity newActivity = booking.getActivity();
             if (activityChanged) {
-                newActivity =iActivityRepository.findById(req.getActivityId())
+                newActivity = iActivityRepository.findById(req.getActivityId())
                         .orElseThrow(() -> new IllegalArgumentException("Activity not found: " + req.getActivityId()));
             }
 
@@ -384,14 +384,19 @@ public class ReservationServiceImpl implements IReservationService {
 
         // Save updated reservation
         iReservationRepository.save(reservation);
-        return reservation;
+        return ReservationMapper.toReservationResponse(
+                reservation,
+                booking.getActivity().getId(),
+                (long) booking.getParticipants(),
+                booking.getTimeSlot()
+        );
     }
 
     public List<Reservation> getDaySchedule(LocalDate date) {
         if (date == null) return List.of();
 
         LocalDateTime from = date.atStartOfDay();
-        LocalDateTime to   = date.plusDays(1).atStartOfDay();
+        LocalDateTime to = date.plusDays(1).atStartOfDay();
 
         // Brug den NYE sorterede repo-metode (bedst):
         List<Booking> bookings = iBookingRepository.findByTimeSlot_StartsAtBetween(from, to);

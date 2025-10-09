@@ -13,6 +13,6 @@ import java.time.LocalDateTime;
 
 public class ReservationResponse {
 
-    private Long id, activityId, participants, totalParticipants;
+    private Long id, activityId, participants;
     private LocalDateTime startsAt;
 }

@@ -2,6 +2,7 @@ package org.example.adventurexp.controller;
 
 import org.example.adventurexp.dto.ReservationLookupDTO;
 import org.example.adventurexp.dto.ActivityDTO;
+import org.example.adventurexp.dto.ReservationResponse;
 import org.example.adventurexp.dto.UpdateReservationRequest;
 import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.model.Equipment;
@@ -90,7 +91,7 @@ public class AdminController {
     }
 
     @PatchMapping("/reservations/{id}")
-    public Reservation updateReservation(@PathVariable("id") Long id, @RequestBody UpdateReservationRequest updateRequest) {
+    public ReservationResponse updateReservation(@PathVariable("id") Long id, @RequestBody UpdateReservationRequest updateRequest) {
         updateRequest.setReservationId(id);
         return reservationService.updateReservation(updateRequest);
     }
