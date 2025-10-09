@@ -324,8 +324,8 @@ class ReservationServiceImplTest {
         var result = sut.getDaySchedule(date);
 
         assertEquals(2, result.size());
-        assertTrue(result.stream().anyMatch(r -> r.getId().equals(1L)));
-        assertTrue(result.stream().anyMatch(r -> r.getId().equals(2L)));
+        assertTrue(result.stream().anyMatch(r -> r.getReservationId().equals(1L)));
+        assertTrue(result.stream().anyMatch(r -> r.getReservationId().equals(2L)));
     }
 
 }
