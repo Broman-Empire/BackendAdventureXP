@@ -104,7 +104,7 @@ class ActivityServiceTest {
         // Assert
         assertThat(result.getMaxParticipants()).isEqualTo(10); // Tjekker at maxParticipants er sat ned til 10
         assertThat(result.getParallelCourts()).isEqualTo(6); // Tjekker at parallelCourts er sat op til 6
-        verify(activityRepository, times(2)).findById(activityId); // Tjekker at findById() blev kaldt 2 gange (1 i updateActivity og 1 i regenerateFutureSlots)
+        verify(activityRepository, times(1)).findById(activityId); // Tjekker at findById() blev kaldt 1 gang
         verify(activityRepository, times(1)).save(any(Activity.class)); // Tjekker at save() blev kaldt 1 gang
         // regenerateFutureSlots ligger i ActivityService og ikke i SlotService :thinko:
         //verify(activityService, times(1)).regenerateFutureSlots(activityId, LocalDate.now()); // Tjekker at fremtidige slots blev genereret
