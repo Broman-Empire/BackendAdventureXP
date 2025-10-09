@@ -14,6 +14,8 @@ public interface ISlotService {
 
     void generateDefaultSlotsForActivity(Long activityId);
 
+    void regenerateFutureSlots(Long activityId, LocalDate fromDate);
+
 }
 
 
