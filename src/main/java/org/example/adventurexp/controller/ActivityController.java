@@ -31,8 +31,8 @@ public class ActivityController {
         return activityService.findAll();
     }
 
-    @GetMapping("/availability")
-    public ResponseEntity<AvailabilityDTO[]> getAvailability(@RequestParam("activityId") long activityId,
+    @GetMapping("/availability/{activityId}")
+    public ResponseEntity<AvailabilityDTO[]> getAvailability(@PathVariable("activityId") long activityId,
                                                              @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
                                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
                                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime openTime,
