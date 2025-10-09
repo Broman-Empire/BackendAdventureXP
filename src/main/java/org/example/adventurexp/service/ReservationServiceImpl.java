@@ -87,13 +87,6 @@ public class ReservationServiceImpl implements IReservationService {
                 .sorted(Comparator.comparing(TimeSlot::getStartsAt))
                 .toList();
 
-//        Her står det samme som de 5 ovenstående linjer.
-//        List<TimeSlot> timeSlots2 = new ArrayList<>();
-//        for (Booking b :  bookings) {
-//            timeSlots2.add(b.getTimeSlot());
-//        }
-//        timeSlots2.sort(Comparator.comparing(TimeSlot::getStartsAt));
-
         for (int i = 0; i < timeSlots.size() - 1; i++) {
             TimeSlot current = timeSlots.get(i);
             TimeSlot next = timeSlots.get(i + 1);

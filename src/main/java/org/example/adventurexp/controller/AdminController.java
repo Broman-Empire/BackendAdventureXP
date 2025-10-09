@@ -84,21 +84,10 @@ public class AdminController {
         return reservationService.getDaySchedule(date);
     }
 
-    @DeleteMapping("/reservations/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable("id") Long id) {
-        reservationService.cancelReservation(id);
-        return ResponseEntity.noContent().build();
-    }
 
-    @PatchMapping("/reservations/{id}")
-    public ReservationResponse updateReservation(@PathVariable("id") Long id, @RequestBody UpdateReservationRequest updateRequest) {
-        updateRequest.setReservationId(id);
-        return reservationService.updateReservation(updateRequest);
-    }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ReservationLookupDTO>> searchReservation(
-            @RequestParam("phone") String phoneNumber) {
+    public ResponseEntity<List<ReservationLookupDTO>> searchReservation(@RequestParam("phone") String phoneNumber) {
 
         List<ReservationLookupDTO> result = reservationService.searchReservation(phoneNumber);
         return ResponseEntity.ok(result);
@@ -109,4 +98,16 @@ public class AdminController {
         return reservationService.getReservationsByDate(date);
     }
 
-}
+    @PatchMapping("/reservations/{id}")
+    public ReservationResponse updateReservation(@PathVariable("id") Long id, @RequestBody UpdateReservationRequest updateRequest) {
+        updateRequest.setReservationId(id);
+        return reservationService.updateReservation(updateRequest);
+    }
+
+
+    @DeleteMapping("/reservations/{id}")
+    public ResponseEntity<Void> deleteReservation(@PathVariable("id") Long id) {
+        reservationService.cancelReservation(id);
+        return ResponseEntity.noContent().build();
+    }
+    }

@@ -27,6 +27,7 @@ public class ReservationController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(response);
+
     }
 
     @PostMapping
@@ -40,12 +41,6 @@ public class ReservationController {
                                                                 @RequestBody UpdateReservationRequest request) {
         ReservationResponse response = reservationService.updateReservation(request);
         return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/admin/reservations/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable("id") Long id) {
-        reservationService.deleteReservation(id);
-        return ResponseEntity.noContent().build(); // 204 No Content
     }
 
 }
