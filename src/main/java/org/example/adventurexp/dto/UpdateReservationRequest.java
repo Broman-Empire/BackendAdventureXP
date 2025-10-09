@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UpdateReservationRequest {
 
-    private Long reservationId;
     private Long activityId;
     private LocalDateTime newStart;
     private Integer newParticipants;

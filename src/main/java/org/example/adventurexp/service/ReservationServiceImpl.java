@@ -2,10 +2,7 @@ package org.example.adventurexp.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.example.adventurexp.dto.CreateReservationDTO;
-import org.example.adventurexp.dto.ReservationLookupDTO;
-import org.example.adventurexp.dto.ReservationResponse;
-import org.example.adventurexp.dto.UpdateReservationRequest;
+import org.example.adventurexp.dto.*;
 import org.example.adventurexp.mapper.ReservationMapper;
 import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.model.Reservation;
@@ -299,14 +296,14 @@ public class ReservationServiceImpl implements IReservationService {
 
     @Transactional
     @Override
-    public ReservationResponse updateReservation(UpdateReservationRequest req) {
-        if (req == null || req.getReservationId() == null) {
+    public ReservationResponse updateReservation(UpdateReservationRequest req, Long id) {
+        if (req == null || id == null) {
             throw new IllegalArgumentException("Update request and reservation ID are required");
         }
 
         // Fetch existing reservation
-        Reservation reservation = iReservationRepository.findById(req.getReservationId())
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + req.getReservationId()));
+        Reservation reservation = iReservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + id));
 
         // Update contact information if provided
         if (req.getContactName() != null && !req.getContactName().isBlank()) {
@@ -320,9 +317,9 @@ public class ReservationServiceImpl implements IReservationService {
         }
 
         // Find the booking associated with this reservation (assuming one booking per reservation for now)
-        List<Booking> bookings = iBookingRepository.findByReservationId(req.getReservationId());
+        List<Booking> bookings = iBookingRepository.findByReservationId(id);
         if (bookings.isEmpty()) {
-            throw new IllegalArgumentException("No bookings found for reservation: " + req.getReservationId());
+            throw new IllegalArgumentException("No bookings found for reservation: " + id);
         }
 
         Booking booking = bookings.get(0); // Get first booking
@@ -385,26 +382,57 @@ public class ReservationServiceImpl implements IReservationService {
         );
     }
 
-    public List<Reservation> getDaySchedule(LocalDate date) {
+    // ---- Dagsplan til app.schedule.admin.js ----
+
+    @Override
+    public List<BookingScheduleDTO> getDaySchedule(LocalDate date) {
         if (date == null) return List.of();
 
         LocalDateTime from = date.atStartOfDay();
         LocalDateTime to = date.plusDays(1).atStartOfDay();
 
-        // Brug den NYE sorterede repo-metode (bedst):
         List<Booking> bookings = iBookingRepository.findByTimeSlot_StartsAtBetween(from, to);
-
         if (bookings == null || bookings.isEmpty()) return List.of();
 
-        // LinkedHashMap bevarer rækkefølgen og sikrer unikke Reservation-objekter
-        Map<Long, Reservation> orderedUnique = new LinkedHashMap<>();
-        for (Booking b : bookings) {
-            if (b == null || b.getReservation() == null) continue;
-            var r = b.getReservation();
-            Long id = r.getId();
-            if (id != null) orderedUnique.putIfAbsent(id, r);
-        }
-        return new ArrayList<>(orderedUnique.values());
+        return bookings.stream()
+                .map(b -> {
+                    BookingScheduleDTO dto = new BookingScheduleDTO();
+                    dto.setBookingId(b.getId());
+                    dto.setParticipants(b.getParticipants());
+
+                    // Sæt standardværdier
+                    dto.setActivityName("Ukendt aktivitet");
+                    dto.setTotalParticipants(0);
+
+                    // Hvorfor alle de if's? = undgå nullPointerException, hvis bookingens relationer ikke er sat
+                    // (Activity, TimeSlot, Reservation) ikke er sat på booking, men vi har nullable = false
+
+                    // --- Activity ---
+                    Activity activity = b.getActivity();
+                    if (activity != null) {
+                        dto.setActivityName(activity.getName());
+                    }
+
+                    // --- TimeSlot ---
+                    TimeSlot slot = b.getTimeSlot();
+                    if (slot != null) {
+                        dto.setStartsAt(slot.getStartsAt());
+                        dto.setEndsAt(slot.getEndsAt());
+                        dto.setTotalParticipants(slot.getCapacity());
+                    }
+
+                    // --- Reservation ---
+                    Reservation reservation = b.getReservation();
+                    if (reservation != null) {
+                        dto.setReservationId(reservation.getId());
+                        dto.setContactName(reservation.getContactName());
+                        dto.setCustomerType(reservation.getCustomerType());
+                    }
+
+                    return dto;
+                })
+                .sorted(Comparator.comparing(BookingScheduleDTO::getStartsAt))
+                .toList();
     }
 
     // Slet en reservation ud fra id
