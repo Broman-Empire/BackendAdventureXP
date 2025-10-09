@@ -65,27 +65,22 @@ public class SlotServiceImpl implements ISlotService {
             LocalDateTime slotStart = currentDate.atTime(openTime);
             LocalDateTime dayEnd = currentDate.atTime(closeTime);
 
-            // Sikrer at vi ikke kører i uendeligt loop
             while (slotStart.plusMinutes(durationMinutes).isBefore(dayEnd)
                     || slotStart.plusMinutes(durationMinutes).equals(dayEnd)) {
 
                 LocalDateTime slotEnd = slotStart.plusMinutes(durationMinutes);
 
-                // Safety: stop hvis aktiviteten slettes midt i processen
                 if (!activityRepository.existsById(activityId)) {
                     System.out.println("Activity " + activityId + " was deleted during slot generation — stopping.");
                     return createdSlots;
                 }
 
-                // Opret slots for hver bane
                 for (int court = 1; court <= parallelCourts; court++) {
                     createIfNotExists(activity, slotStart, slotEnd, maxParticipants, court);
                 }
 
-                // Flyt starttidspunktet frem til næste slot
                 slotStart = slotEnd;
 
-                // ekstra sikkerhed: hvis varigheden er 0 (fx fejl), break for at undgå infinite loop
                 if (durationMinutes <= 0) {
                     System.out.println("Duration is 0 for activity " + activityId + ", aborting slot generation.");
                     break;
@@ -97,29 +92,28 @@ public class SlotServiceImpl implements ISlotService {
 
         System.out.printf("Finished generating slots for activity %d (%d min, %d courts)%n",
                 activityId, durationMinutes, parallelCourts);
-    public void regenerateFutureSlots(Long activityId, LocalDate fromDate) {
-        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new IllegalArgumentException("Activity not found: " + activityId));
-
-        // Delete existing slots from 'fromDate' onwards
-        LocalDateTime fromDateTime = fromDate.atStartOfDay();
-        List<TimeSlot> slotsToDelete = timeSlotRepository.findByActivityAndStartsAtAfter(activity, fromDateTime);
-        timeSlotRepository.deleteAll(slotsToDelete);
-
-        // Regenerate slots (daily from 08 to 22)
-        LocalDate toDate = fromDate.plusDays(30); // Regenerate slots for the next 30 days
-        LocalTime openTime = LocalTime.of(8, 0); // opens at 08:00
-        LocalTime closeTime = LocalTime.of(22, 0); // closes at 22:00
-
-        generateSlots(activityId, fromDate, toDate, openTime, closeTime);
-    }
-
 
         return createdSlots;
     }
 
+    // ---- Regenerer fremtidige slots ----
+    public void regenerateFutureSlots(Long activityId, LocalDate fromDate) {
+        Activity activity = activityRepository.findById(activityId)
+                .orElseThrow(() -> new IllegalArgumentException("Activity not found: " + activityId));
+
+        LocalDateTime fromDateTime = fromDate.atStartOfDay();
+        List<TimeSlot> slotsToDelete = timeSlotRepository.findByActivityAndStartsAtAfter(activity, fromDateTime);
+        timeSlotRepository.deleteAll(slotsToDelete);
+
+        LocalDate toDate = fromDate.plusDays(30);
+        LocalTime openTime = LocalTime.of(8, 0);
+        LocalTime closeTime = LocalTime.of(22, 0);
+
+        generateSlots(activityId, fromDate, toDate, openTime, closeTime);
+    }
+
     // ---- Hjælpemetode ----
     private void createIfNotExists(Activity activity, LocalDateTime start, LocalDateTime end, int capacity, int court) {
-
         Optional<TimeSlot> existingTimeSlot =
                 timeSlotRepository.findByActivityAndStartsAtAndCourt(activity, start, court);
 
