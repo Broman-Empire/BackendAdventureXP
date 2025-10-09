@@ -2,6 +2,10 @@ package org.example.adventurexp.model;
 
 import jakarta.persistence.*;
 
+import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "activity")
 public class Activity {
@@ -19,6 +23,9 @@ public class Activity {
     private int durationMinutes;
     private int parallelCourts;
 
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TimeSlot> timeSlots = new ArrayList<>();
+
     public Activity() {
     }
 
@@ -31,6 +38,19 @@ public class Activity {
         this.durationMinutes = durationMinutes;
         this.parallelCourts = parallelCourts;
     }
+
+    // Hjælpefunktioner til at holde relationer konsistent
+    public void addTimeSlot(TimeSlot timeSlot) {
+        timeSlots.add(timeSlot);
+        timeSlot.setActivity(this);
+    }
+
+    public void removeTimeSlot(TimeSlot timeSlot) {
+        timeSlots.remove(timeSlot);
+        timeSlot.setActivity(null);
+    }
+
+    // ---- Getters & Setters ----
 
     public Long getId() {
         return id;
@@ -88,4 +108,11 @@ public class Activity {
         this.parallelCourts = parallelUnits;
     }
 
+    public List<TimeSlot> getTimeSlots() {
+        return timeSlots;
+    }
+
+    public void setTimeSlots(List<TimeSlot> timeSlots) {
+        this.timeSlots = timeSlots;
+    }
 }

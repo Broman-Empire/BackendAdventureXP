@@ -1,6 +1,8 @@
 package org.example.adventurexp.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -22,6 +24,7 @@ public class TimeSlot {
     // Relation til Activity
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "activity_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Activity activity;
 
 
