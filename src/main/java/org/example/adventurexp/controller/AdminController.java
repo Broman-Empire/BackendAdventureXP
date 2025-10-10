@@ -58,6 +58,16 @@ public class AdminController {
 
     // --- Equipment CRUD ---
 
+    // POST /api/admin/activities/{activityId}/equipment
+    @PostMapping("/activities/{activityId}/equipment")
+    public ResponseEntity<Equipment> addEquipment(
+            @PathVariable long activityId,
+            @RequestBody Equipment equipment) {
+
+        Equipment newEquipment = equipmentService.createEquipmentForActivity(activityId, equipment);
+        return ResponseEntity.ok(newEquipment);
+    }
+
     // GET /api/admin/activities/{id}/equipment
     @GetMapping("/activities/{id}/equipment")
     public List<Equipment> listByActivity(@PathVariable("id") Long activityId) {

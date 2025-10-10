@@ -46,10 +46,9 @@ public class EquipmentServiceImpl implements IEquipmentService {
         return getEquipmentByActivityId(activityId);
     }
 
-    // TODO: Den drillede mig :( så jeg lod Hibernate klarer det, kh Sofie
     @Override
-    public Equipment addEquipment(long activityId, Equipment equipment) {
-        //Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new IllegalArgumentException("Activity not found: " + activityId));
+    public Equipment createEquipmentForActivity(long activityId, Equipment equipment) {
+        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new IllegalArgumentException("Activity not found: " + activityId));
 
         //check for duplicates
         List<Equipment> existingEquipment = equipmentRepository.findByActivityId(activityId)
@@ -59,7 +58,7 @@ public class EquipmentServiceImpl implements IEquipmentService {
         if(!existingEquipment.isEmpty()) {
            return existingEquipment.getFirst(); // return existing equipment if duplicate is found
         }
-        //equipment.setActivity(activity);
+        equipment.setActivity(activity);
         return equipmentRepository.save(equipment);
     }
 
