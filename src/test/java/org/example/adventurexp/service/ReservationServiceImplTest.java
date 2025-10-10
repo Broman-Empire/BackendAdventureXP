@@ -210,21 +210,21 @@ class ReservationServiceImplTest {
         reservation.setId(reservationId);
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation)); // reservation found
 
-        sut.cancelReservation(reservationId);
+        sut.deleteReservation(reservationId);
 
         verify(reservationRepository).delete(reservation);
     }
 
     @Test
     void cancelReservation_nullId_throws() {
-        assertThrows(IllegalArgumentException.class, () -> sut.cancelReservation(null));
+        assertThrows(IllegalArgumentException.class, () -> sut.deleteReservation(null));
     }
 
     @Test
     void cancelReservation_notFound_throws() {
         Long reservationId = 88L;
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.empty()); // reservation not found
-        assertThrows(IllegalArgumentException.class, () -> sut.cancelReservation(reservationId));
+        assertThrows(IllegalArgumentException.class, () -> sut.deleteReservation(reservationId));
     }
 
 
