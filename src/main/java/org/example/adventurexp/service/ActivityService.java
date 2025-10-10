@@ -39,6 +39,21 @@ public class ActivityService implements IActivityService {
 
     private static final Logger logger = LoggerFactory.getLogger(ActivityService.class);
 
+    // ---- Create Activity ----
+    @Override
+    public Activity createActivity(Activity activity) {
+        Activity newActivity = activityRepository.save(activity);
+
+        // Opret Equipment, men kun én lige nu
+        if (activity.getE)
+
+        // Default slotsgenerering for en ny aktivitet
+        slotService.generateDefaultSlotsForActivity(activity.getId());
+
+        return newActivity;
+    }
+
+    // ---- Read all Activities ----
     @Override
     public List<ActivityDTO> findAll() {
 
@@ -52,16 +67,7 @@ public class ActivityService implements IActivityService {
                 .toList(); // Returnerer DTO'er i en liste
     }
 
-    @Override
-    public Activity createActivity(Activity activity) {
-        Activity newActivity = activityRepository.save(activity);
-
-        // Default slotsgenerering for en ny aktivitet
-        slotService.generateDefaultSlotsForActivity(activity.getId());
-
-        return newActivity;
-    }
-
+    // ---- Update Activity ----
     @Override
     public Activity updateActivity(Long id, Activity activity) {
         Activity toBeUpdated = activityRepository.findById(id).orElseThrow(); // Smider exception hvis ikke id findes. Så undgår jeg at skulle bruge Optional
@@ -80,6 +86,7 @@ public class ActivityService implements IActivityService {
         return updatedActivity;
     }
 
+    // ---- Delete Activity ----
     @Override
     @Transactional
     public Activity deleteActivity(Long id) {

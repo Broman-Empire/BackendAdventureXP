@@ -26,6 +26,11 @@ public class Activity {
     @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TimeSlot> timeSlots = new ArrayList<>();
 
+
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Equipment> equipmentList = new ArrayList<>();
+
+
     public Activity() {
     }
 
@@ -115,4 +120,25 @@ public class Activity {
     public void setTimeSlots(List<TimeSlot> timeSlots) {
         this.timeSlots = timeSlots;
     }
+
+    // Hjælpefunktioner (ikke i brug pt, men bevarer relationens konsistens ved behov)
+    public void addEquipment(Equipment equipment) {
+        equipmentList.add(equipment);
+        equipment.setActivity(this);
+    }
+
+    public void removeEquipment(Equipment equipment) {
+        equipmentList.remove(equipment);
+        equipment.setActivity(null);
+    }
+
+    public List<Equipment> getEquipmentList() {
+        return equipmentList;
+    }
+
+    public void setEquipmentList(List<Equipment> equipmentList) {
+        this.equipmentList = equipmentList;
+    }
+
+
 }
