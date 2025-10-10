@@ -24,8 +24,8 @@ public interface IReservationService{
     @Transactional
     ReservationResponse createReservation(CreateReservationDTO request);
 
-    @Transactional
-    ReservationResponse updateReservation(UpdateReservationRequest req, Long id);
+//    @Transactional
+//    ReservationResponse updateReservation(UpdateReservationRequest req, Long id);
 
     List<BookingScheduleDTO> getDaySchedule(LocalDate date);
   
