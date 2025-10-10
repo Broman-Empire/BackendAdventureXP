@@ -9,6 +9,7 @@ import org.example.adventurexp.repository.ITimeSlotRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,28 +36,35 @@ public class AvailabilityServiceImpl implements IAvailabilityService {
     @Override
     public AvailabilityDTO[] getDailyAvailability(long activityId, LocalDate fromDate, LocalDate toDate, LocalTime openTime, LocalTime closeTime) {
         if (fromDate == null || toDate == null || openTime == null || closeTime == null)
-            throw new IllegalArgumentException("Date must be provided"); // Tjek for null dato
+            throw new IllegalArgumentException("Date must be provided");
 
-        List<TimeSlot> slots = iSlotService.generateSlots(activityId, fromDate, toDate, openTime, closeTime);
-        List<AvailabilityDTO> availableSlots = new ArrayList<>();
+        Activity activity = iActivityRepository.findById(activityId)
+                .orElseThrow(() -> new IllegalArgumentException("Activity not found: " + activityId));
+
+        LocalDateTime from = fromDate.atTime(openTime); // Start of the day at opening time
+        LocalDateTime to = toDate.atTime(closeTime); // End of the day at closing time
+
+        List<TimeSlot> slots = iTimeSlotRepository.findByActivityAndStartsAtBetween(activity, from, to); // get timeslots from DB
+
+        List<AvailabilityDTO> result = new ArrayList<>();
 
         for (TimeSlot slot : slots) {
-            // findById returnerer Optional<Activity>, så brug .orElse(null)
-            Activity activity = iActivityRepository.findById(activityId).orElse(null);
-            int remaining = computeRemaining(slot, activity);
-            if (remaining > 0) {
-                AvailabilityDTO dto = new AvailabilityDTO(
-                    slot.getStartsAt(), // Starttidspunkt
-                    slot.getEndsAt(),   // Sluttidspunkt
-                    slot.getCapacity(), // Kapacitet
-                    remaining,          // Ledige pladser
-                    false               // Udsolgt
-                );
-                availableSlots.add(dto);
+            int usableSets = iEquipmentService.usableSets(activity); // get usable equipment sets
+            int reserved = iReservationService.reservedCount(slot, activity); // get reserved count
+            int max = Math.min(slot.getCapacity(), usableSets); // max possible pax
+            int remaining = Math.max(max - reserved, 0); // calculate remaining, never negative
+
+            if (remaining > 0) { // only include slots with remaining > 0
+                result.add(new AvailabilityDTO(
+                        slot.getStartsAt(),
+                        slot.getEndsAt(),
+                        slot.getCapacity(),
+                        remaining,
+                        false
+                ));
             }
         }
-        // Returnér som array
-        return availableSlots.toArray(new AvailabilityDTO[0]);
+        return result.toArray(new AvailabilityDTO[0]); // return as array
     }
 
 
