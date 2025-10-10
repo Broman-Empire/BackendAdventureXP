@@ -19,7 +19,7 @@ public interface IReservationService{
     int reservedCount(TimeSlot slot, Activity activity);
 
     @Transactional
-    void cancelReservation(Long reservationId);
+    void deleteReservation(Long reservationId);
 
     @Transactional
     ReservationResponse createReservation(CreateReservationDTO request);
@@ -30,8 +30,6 @@ public interface IReservationService{
     List<BookingScheduleDTO> getDaySchedule(LocalDate date);
   
     List<ReservationLookupDTO> searchReservation(String string);
-
-    void deleteReservation(Long reservationId);
 
     List<ReservationLookupDTO> getReservationsByDate(LocalDate date);
 }

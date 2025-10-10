@@ -20,16 +20,6 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ReservationResponse> getReservation(@PathVariable Long id) {
-        ReservationResponse response = reservationService.getReservationById(id);
-        if(response == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(response);
-
-    }
-
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody CreateReservationDTO request) {
         ReservationResponse response = reservationService.createReservation(request);
