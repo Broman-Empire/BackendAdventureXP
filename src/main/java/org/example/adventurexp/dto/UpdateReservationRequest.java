@@ -17,5 +17,6 @@ public class UpdateReservationRequest {
     private String contactName;
     private String email;
     private String phone; // valgfri
+    private String customerType; // valgfri
 
 }
