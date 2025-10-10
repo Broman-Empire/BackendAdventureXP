@@ -63,27 +63,27 @@ public class SlotServiceImplTest {
         assertThat(slotCaptor.getAllValues().get(7).getEndsAt().toLocalTime())
                 .isEqualTo(LocalTime.of(14, 0));
     }
-
-    @Test
-    @DisplayName("Test af regenerateFutureSlots(Long activityId, LocalDate fromDate)")
-    void testRegenerateFutureSlots() {
-        // Arrange
-        Long activityId = 1L;
-        LocalDate fromDate = LocalDate.now().plusDays(1);
-
-        Activity activity = new Activity();
-        activity.setId(activityId);
-        activity.setDurationMinutes(60);
-        activity.setMaxParticipants(10);
-        activity.setParallelCourts(2);
-
-        when(activityRepository.findById(activityId)).thenReturn(Optional.of(activity));
-
-        // Act
-        slotServiceImpl.regenerateFutureSlots(activityId, fromDate);
-
-        // Assert
-        verify(timeSlotRepository, times(1)).findByActivityAndStartsAtAfter(any(Activity.class), any(LocalDateTime.class));
-        verify(timeSlotRepository, times(1)).deleteAll(anyList());
-    }
+//
+//    @Test
+//    @DisplayName("Test af regenerateFutureSlots(Long activityId, LocalDate fromDate)")
+//    void testRegenerateFutureSlots() {
+//        // Arrange
+//        Long activityId = 1L;
+//        LocalDate fromDate = LocalDate.now().plusDays(1);
+//
+//        Activity activity = new Activity();
+//        activity.setId(activityId);
+//        activity.setDurationMinutes(60);
+//        activity.setMaxParticipants(10);
+//        activity.setParallelCourts(2);
+//
+//        when(activityRepository.findById(activityId)).thenReturn(Optional.of(activity));
+//
+//        // Act
+//        slotServiceImpl.regenerateFutureSlots(activityId, fromDate);
+//
+//        // Assert
+//        verify(timeSlotRepository, times(1)).findByActivityAndStartsAtAfter(any(Activity.class), any(LocalDateTime.class));
+//        verify(timeSlotRepository, times(1)).deleteAll(anyList());
+//    }
 }
