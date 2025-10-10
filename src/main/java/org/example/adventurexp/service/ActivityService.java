@@ -5,6 +5,7 @@ import org.example.adventurexp.dto.ActivityDTO;
 import org.example.adventurexp.exception.ActivityHasBookingsException;
 import org.example.adventurexp.mapper.ActivityMapper;
 import org.example.adventurexp.model.Activity;
+import org.example.adventurexp.model.Equipment;
 import org.example.adventurexp.model.TimeSlot;
 import org.example.adventurexp.repository.IActivityRepository;
 import org.example.adventurexp.repository.IBookingRepository;
@@ -21,24 +22,50 @@ import java.util.List;
 @Service
 public class ActivityService implements IActivityService {
 
-    //IBookingService bookingService; // TODO Den findes ikke, men skal jo eksistere på et tidspunkt
     IActivityRepository activityRepository;
     ITimeSlotRepository timeSlotRepository;
     IBookingRepository bookingRepository;
     ISlotService slotService;
+    IEquipmentService equipmentService;
 
     public ActivityService(IActivityRepository activityRepository,
                            ITimeSlotRepository timeSlotRepository,
                            IBookingRepository bookingRepository,
-                           ISlotService slotService) {
+                           ISlotService slotService,
+                           IEquipmentService equipmentService) {
         this.activityRepository = activityRepository;
         this.timeSlotRepository = timeSlotRepository;
         this.bookingRepository = bookingRepository;
         this.slotService = slotService;
+        this.equipmentService = equipmentService;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(ActivityService.class);
 
+    // ---- Create Activity ----
+    @Override
+    public Activity createActivity(Activity activity) {
+
+        // Hvis der findes udstyr, sørg for at sætte tilbagekoblingen
+//        if (activity.getEquipmentList() != null) {
+//            activity.getEquipmentList().forEach(e -> e.setActivity(activity));
+//        }
+        if (activity.getEquipmentList() != null && !activity.getEquipmentList().isEmpty()) {
+            for (Equipment e : activity.getEquipmentList()) {
+                e.setActivity(activity);
+            }
+        }
+
+
+        Activity newActivity = activityRepository.save(activity);
+
+        // Slots laves bagefter
+        slotService.generateDefaultSlotsForActivity(newActivity.getId());
+
+        return newActivity;
+    }
+
+    // ---- Read all Activities ----
     @Override
     public List<ActivityDTO> findAll() {
 
@@ -52,16 +79,7 @@ public class ActivityService implements IActivityService {
                 .toList(); // Returnerer DTO'er i en liste
     }
 
-    @Override
-    public Activity createActivity(Activity activity) {
-        Activity newActivity = activityRepository.save(activity);
-
-        // Default slotsgenerering for en ny aktivitet
-        slotService.generateDefaultSlotsForActivity(activity.getId());
-
-        return newActivity;
-    }
-
+    // ---- Update Activity ----
     @Override
     public Activity updateActivity(Long id, Activity activity) {
         Activity toBeUpdated = activityRepository.findById(id).orElseThrow(); // Smider exception hvis ikke id findes. Så undgår jeg at skulle bruge Optional
@@ -80,6 +98,7 @@ public class ActivityService implements IActivityService {
         return updatedActivity;
     }
 
+    // ---- Delete Activity ----
     @Override
     @Transactional
     public Activity deleteActivity(Long id) {

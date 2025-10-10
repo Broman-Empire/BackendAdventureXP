@@ -47,7 +47,7 @@ public class EquipmentServiceImpl implements IEquipmentService {
     }
 
     @Override
-    public Equipment addEquipment(long activityId, Equipment equipment) {
+    public Equipment createEquipmentForActivity(long activityId, Equipment equipment) {
         Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new IllegalArgumentException("Activity not found: " + activityId));
 
         //check for duplicates

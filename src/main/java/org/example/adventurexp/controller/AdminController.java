@@ -37,8 +37,9 @@ public class AdminController {
 
     // POST /api/admin/activities
     @PostMapping("/activities")
-    public Activity createActivity(@RequestBody Activity activity) {
-        return activityService.createActivity(activity);
+    public ResponseEntity<Activity> createActivity(@RequestBody Activity activity) {
+        Activity newActivity = activityService.createActivity(activity);
+        return ResponseEntity.ok(newActivity);
     }
 
     // PATCH /api/admin/activities/{id}
@@ -56,6 +57,16 @@ public class AdminController {
     }
 
     // --- Equipment CRUD ---
+
+    // POST /api/admin/activities/{activityId}/equipment
+    @PostMapping("/activities/{activityId}/equipment")
+    public ResponseEntity<Equipment> addEquipment(
+            @PathVariable long activityId,
+            @RequestBody Equipment equipment) {
+
+        Equipment newEquipment = equipmentService.createEquipmentForActivity(activityId, equipment);
+        return ResponseEntity.ok(newEquipment);
+    }
 
     // GET /api/admin/activities/{id}/equipment
     @GetMapping("/activities/{id}/equipment")

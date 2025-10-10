@@ -71,5 +71,4 @@ public class Equipment {
         this.activity = activity;
     }
 
-
 }

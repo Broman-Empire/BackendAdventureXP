@@ -16,7 +16,7 @@ public interface IEquipmentService {
 
     List<Equipment> listByActivity(long activityId);
 
-    Equipment addEquipment(long activityId, Equipment equipment);
+    Equipment createEquipmentForActivity(long activityId, Equipment equipment);
 
     Equipment updateEquipment(long equipmentId, Equipment patch);
 
