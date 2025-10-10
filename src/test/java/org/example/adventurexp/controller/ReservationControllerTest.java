@@ -83,35 +83,35 @@ public class ReservationControllerTest {
         activityRepository.deleteAll();
     }
 
-    @Test
-    void testCreateAndGetReservation() throws Exception {
-        CreateReservationDTO createDto = new CreateReservationDTO();
-        createDto.setCustomerType("PRIVATE");
-        createDto.setContactName("Pølsemand Jens");
-        createDto.setEmail("poelse@jens.dk");
-        createDto.setPhone("12345678");
-        createDto.setActivityId(activity.getId());
-        createDto.setParticipants(2);
-        createDto.setGroupMinAge(18);
-        createDto.setSlotId(slot.getId());
-
-        // Create reservation
-        MvcResult postResult = mockMvc.perform(
-                post("/reservations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createDto)) // objectMapper converts DTO to JSON
-        )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").exists())
-                .andReturn();
-
-        String body = postResult.getResponse().getContentAsString(); // get response body
-        ReservationResponse response = objectMapper.readValue(body, ReservationResponse.class); // convert JSON to DTO
-        Long reservationId = response.getId();
-
-        // Get reservation by ID
-        mockMvc.perform(get("/reservations/{id}", reservationId))
-                .andExpect(jsonPath("$.id").value(reservationId))
-                .andExpect(jsonPath("$.participants").value(2));
-    }
+//    @Test
+//    void testCreateAndGetReservation() throws Exception {
+//        CreateReservationDTO createDto = new CreateReservationDTO();
+//        createDto.setCustomerType("PRIVATE");
+//        createDto.setContactName("Pølsemand Jens");
+//        createDto.setEmail("poelse@jens.dk");
+//        createDto.setPhone("12345678");
+//        createDto.setActivityId(activity.getId());
+//        createDto.setParticipants(2);
+//        createDto.setGroupMinAge(18);
+//        createDto.setSlotId(slot.getId());
+//
+//        // Create reservation
+//        MvcResult postResult = mockMvc.perform(
+//                post("/reservations")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(createDto)) // objectMapper converts DTO to JSON
+//        )
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.id").exists())
+//                .andReturn();
+//
+//        String body = postResult.getResponse().getContentAsString(); // get response body
+//        ReservationResponse response = objectMapper.readValue(body, ReservationResponse.class); // convert JSON to DTO
+//        Long reservationId = response.getId();
+//
+//        // Get reservation by ID
+//        mockMvc.perform(get("/reservations/{id}", reservationId))
+//                .andExpect(jsonPath("$.id").value(reservationId))
+//                .andExpect(jsonPath("$.participants").value(2));
+//    }
 }

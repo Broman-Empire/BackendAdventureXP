@@ -29,6 +29,16 @@ public class Booking {
     @JoinColumn(name = "activity_id", nullable = false) // Vi har ikke referencedColumnName, da den leder efter "id"
     Activity activity;                                  // by default. Hed vores PK noget andet, ville vi bruge det.
 
+    private int participants;
+
+
+    public Booking(Reservation reservation, TimeSlot timeSlot, int participants) {
+        this.reservation = reservation;
+        this.timeSlot = timeSlot;
+        this.participants = participants;
+    }
+
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -49,13 +59,6 @@ public class Booking {
         this.activity = activity;
     }
 
-    private int participants;
-
-    public Booking(Reservation reservation, TimeSlot timeSlot, int participants) {
-        this.reservation = reservation;
-        this.timeSlot = timeSlot;
-        this.participants = participants;
-    }
 
     public Booking() {
     }

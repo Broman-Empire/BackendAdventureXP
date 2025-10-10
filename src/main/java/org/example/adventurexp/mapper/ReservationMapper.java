@@ -29,7 +29,9 @@ public class ReservationMapper {
                 .collect(Collectors.toList()));
 
         return dto;
+
     }
+
 
     private static BookingSummaryDTO toBookingSummaryDTO(Booking booking) {
         if (booking == null) return null;

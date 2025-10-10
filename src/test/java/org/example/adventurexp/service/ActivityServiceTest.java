@@ -1,6 +1,7 @@
 package org.example.adventurexp.service;
 
 import org.example.adventurexp.dto.ActivityDTO;
+import org.example.adventurexp.exception.ActivityHasBookingsException;
 import org.example.adventurexp.mapper.ActivityMapper;
 import org.example.adventurexp.model.Activity;
 import org.example.adventurexp.model.TimeSlot;
@@ -144,7 +145,7 @@ class ActivityServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> activityService.deleteActivity(activityId))
-                .isInstanceOf(IllegalArgumentException.class) // Jf. den exception der kastes i ActivityService
+                .isInstanceOf(ActivityHasBookingsException.class) // Jf. den exception der kastes i ActivityService
                 .hasMessageContaining("Cannot delete activity with existing bookings"); // Jf. den besked der kastes i ActivityService
 
         verify(activityRepository, times(1)).findById(activityId); // Tjekker at findById() blev kaldt 1 gang

@@ -77,6 +77,18 @@ public class AdminController {
 
     // --- Reservation CRUD ---
 
+    // Create ligger i ReservationController
+
+    @GetMapping("/reservations/{id}")
+    public ResponseEntity<ReservationResponse> getReservation(@PathVariable Long id) {
+        ReservationResponse response = reservationService.getReservationById(id);
+        if(response == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(response);
+
+    }
+
     @GetMapping("/schedule")
     public List<BookingScheduleDTO> getDailySchedule(@RequestParam("date") LocalDate date) {
         return reservationService.getDaySchedule(date);
@@ -105,7 +117,7 @@ public class AdminController {
 
     @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable("id") Long id) {
-        reservationService.cancelReservation(id);
+        reservationService.deleteReservation(id);
         return ResponseEntity.noContent().build();
     }
 }
