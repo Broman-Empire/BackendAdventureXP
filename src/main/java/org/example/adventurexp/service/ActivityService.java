@@ -5,6 +5,7 @@ import org.example.adventurexp.dto.ActivityDTO;
 import org.example.adventurexp.exception.ActivityHasBookingsException;
 import org.example.adventurexp.mapper.ActivityMapper;
 import org.example.adventurexp.model.Activity;
+import org.example.adventurexp.model.Equipment;
 import org.example.adventurexp.model.TimeSlot;
 import org.example.adventurexp.repository.IActivityRepository;
 import org.example.adventurexp.repository.IBookingRepository;
@@ -21,20 +22,22 @@ import java.util.List;
 @Service
 public class ActivityService implements IActivityService {
 
-    //IBookingService bookingService; // TODO Den findes ikke, men skal jo eksistere på et tidspunkt
     IActivityRepository activityRepository;
     ITimeSlotRepository timeSlotRepository;
     IBookingRepository bookingRepository;
     ISlotService slotService;
+    IEquipmentService equipmentService;
 
     public ActivityService(IActivityRepository activityRepository,
                            ITimeSlotRepository timeSlotRepository,
                            IBookingRepository bookingRepository,
-                           ISlotService slotService) {
+                           ISlotService slotService,
+                           IEquipmentService equipmentService) {
         this.activityRepository = activityRepository;
         this.timeSlotRepository = timeSlotRepository;
         this.bookingRepository = bookingRepository;
         this.slotService = slotService;
+        this.equipmentService = equipmentService;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(ActivityService.class);
@@ -42,13 +45,22 @@ public class ActivityService implements IActivityService {
     // ---- Create Activity ----
     @Override
     public Activity createActivity(Activity activity) {
+
+        // Hvis der findes udstyr, sørg for at sætte tilbagekoblingen
+//        if (activity.getEquipmentList() != null) {
+//            activity.getEquipmentList().forEach(e -> e.setActivity(activity));
+//        }
+        if (activity.getEquipmentList() != null && !activity.getEquipmentList().isEmpty()) {
+            for (Equipment e : activity.getEquipmentList()) {
+                e.setActivity(activity);
+            }
+        }
+
+
         Activity newActivity = activityRepository.save(activity);
 
-        // Opret Equipment, men kun én lige nu
-        if (activity.getE)
-
-        // Default slotsgenerering for en ny aktivitet
-        slotService.generateDefaultSlotsForActivity(activity.getId());
+        // Slots laves bagefter
+        slotService.generateDefaultSlotsForActivity(newActivity.getId());
 
         return newActivity;
     }

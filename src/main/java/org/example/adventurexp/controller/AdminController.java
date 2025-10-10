@@ -37,8 +37,9 @@ public class AdminController {
 
     // POST /api/admin/activities
     @PostMapping("/activities")
-    public Activity createActivity(@RequestBody Activity activity) {
-        return activityService.createActivity(activity);
+    public ResponseEntity<Activity> createActivity(@RequestBody Activity activity) {
+        Activity newActivity = activityService.createActivity(activity);
+        return ResponseEntity.ok(newActivity);
     }
 
     // PATCH /api/admin/activities/{id}
