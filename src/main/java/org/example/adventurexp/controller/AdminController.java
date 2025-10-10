@@ -107,12 +107,12 @@ public class AdminController {
         return reservationService.getReservationsByDate(date);
     }
 
-    @PatchMapping("/reservations/{id}")
-    public ResponseEntity<ReservationResponse> patchReservation(@PathVariable Long id,
-                                                                @RequestBody UpdateReservationRequest request) {
-        ReservationResponse response = reservationService.updateReservation(request, id);
-        return ResponseEntity.ok(response);
-    }
+//    @PatchMapping("/reservations/{id}")
+//    public ResponseEntity<ReservationResponse> patchReservation(@PathVariable Long id,
+//                                                                @RequestBody UpdateReservationRequest request) {
+//        ReservationResponse response = reservationService.updateReservation(request, id);
+//        return ResponseEntity.ok(response);
+//    }
 
 
     @DeleteMapping("/reservations/{id}")
