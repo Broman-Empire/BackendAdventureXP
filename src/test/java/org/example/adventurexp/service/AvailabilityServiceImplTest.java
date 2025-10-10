@@ -114,9 +114,12 @@ class AvailabilityServiceImplTest {
         slot2.setStartsAt(LocalDateTime.of(2025, 10, 6, 11, 0));
         slot2.setEndsAt(LocalDateTime.of(2025, 10, 6, 12, 0));
 
-        when(slotService.generateSlots(activityId, from, to, open, close)).thenReturn(List.of(slot1, slot2)); // return both slots
         Activity activity = new Activity();
+        activity.setId(activityId);
+        activity.setMaxParticipants(5);
         when(activityRepository.findById(activityId)).thenReturn(Optional.of(activity)); // return activity
+        when(timeSlotRepository.findByActivityAndStartsAtBetween(activity,
+                from.atTime(open), to.atTime(close))).thenReturn(List.of(slot1, slot2));
         // for both slots, usableSets == 5
         when(equipmentService.usableSets(activity)).thenReturn(5);
         // slot1: remaining = min(5,5)-3 = 2

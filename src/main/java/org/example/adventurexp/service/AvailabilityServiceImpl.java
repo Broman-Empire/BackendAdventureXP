@@ -46,19 +46,27 @@ public class AvailabilityServiceImpl implements IAvailabilityService {
 
         List<TimeSlot> slots = iTimeSlotRepository.findByActivityAndStartsAtBetween(activity, from, to); // get timeslots from DB
 
+        int usableSets = Math.max(iEquipmentService.usableSets(activity), 0);
+        if (usableSets == 0 && activity.getMaxParticipants() > 0) { // if no usableSet
+            usableSets = activity.getMaxParticipants(); // use activity max participants
+        }
         List<AvailabilityDTO> result = new ArrayList<>();
 
         for (TimeSlot slot : slots) {
-            int usableSets = iEquipmentService.usableSets(activity); // get usable equipment sets
+            int slotCapacity = slot.getCapacity();
+            if (slotCapacity <= 0 && activity.getMaxParticipants() > 0) {  //if no slot capacity
+                slotCapacity = activity.getMaxParticipants(); // use activity max participants
+            }
+
             int reserved = iReservationService.reservedCount(slot, activity); // get reserved count
-            int max = Math.min(slot.getCapacity(), usableSets); // max possible pax
+            int max = Math.min(slotCapacity, usableSets); // max possible pax
             int remaining = Math.max(max - reserved, 0); // calculate remaining, never negative
 
             if (remaining > 0) { // only include slots with remaining > 0
                 result.add(new AvailabilityDTO(
                         slot.getStartsAt(),
                         slot.getEndsAt(),
-                        slot.getCapacity(),
+                        slotCapacity,
                         remaining,
                         false
                 ));
