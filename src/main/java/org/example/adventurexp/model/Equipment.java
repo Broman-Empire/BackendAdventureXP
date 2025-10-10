@@ -1,5 +1,6 @@
 package org.example.adventurexp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -16,6 +17,7 @@ public class Equipment {
 
     @ManyToOne(fetch = FetchType.LAZY) // Henter kun Equipment, når den kaldes (fordi den relateres til Activity)
     @JoinColumn(name = "activity_id", referencedColumnName = "id", nullable = false) // Foreign key kolonne i DB
+    @JsonIgnore
     private Activity activity; // FK kommer fra Activity
 
 
