@@ -86,4 +86,4 @@ import static org.assertj.core.api.Assertions.assertThat;
 //        verify(timeSlotRepository, times(1)).findByActivityAndStartsAtAfter(any(Activity.class), any(LocalDateTime.class));
 //        verify(timeSlotRepository, times(1)).deleteAll(anyList());
 //    }
-}
+//}
