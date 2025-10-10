@@ -204,7 +204,7 @@ public class ReservationServiceImpl implements IReservationService {
 
                 .sorted(Comparator.comparing(BookingScheduleDTO::getStartsAt))
                 .toList();
-    } //TODO Hvem mon der opdager mig ;D
+    } //TODO Hvem mon der opdager mig ;D <--- Jeg fandt dig :p
 
     // ---- Update Reservation ----
 
@@ -228,6 +228,9 @@ public class ReservationServiceImpl implements IReservationService {
         }
         if (req.getPhone() != null && !req.getPhone().isBlank()) {
             reservation.setPhone(req.getPhone());
+        }
+        if (req.getCustomerType() != null && !req.getCustomerType().isBlank()) {
+            reservation.setCustomerType(req.getCustomerType());
         }
 
         // Find the booking associated with this reservation (assuming one booking per reservation for now)
