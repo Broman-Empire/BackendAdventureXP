@@ -200,8 +200,15 @@ public class ReservationServiceImpl implements IReservationService {
 
                     return dto;
                 })
-                .sorted(Comparator.comparing(BookingScheduleDTO::getStartsAt))
+                // filtrér dem uden startsAt, så sortering aldrig fejler
+                .filter(dto -> dto.getStartsAt() != null)
+                // null-sikker sortering (bare for en sikkerheds skyld)
+                .sorted(Comparator.comparing(
+                        BookingScheduleDTO::getStartsAt,
+                        Comparator.nullsLast(Comparator.naturalOrder())
+                ))
                 .toList();
+
     }
 
     // ---- Update Reservation ----
