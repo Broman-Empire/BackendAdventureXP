@@ -204,7 +204,7 @@ public class ReservationServiceImpl implements IReservationService {
 
                 .sorted(Comparator.comparing(BookingScheduleDTO::getStartsAt))
                 .toList();
-    }
+    } //TODO Hvem mon der opdager mig ;D
 
     // ---- Update Reservation ----
 
