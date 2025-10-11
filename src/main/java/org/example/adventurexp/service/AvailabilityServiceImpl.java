@@ -68,6 +68,7 @@ public class AvailabilityServiceImpl implements IAvailabilityService {
                         slot.getEndsAt(),
                         slotCapacity,
                         remaining,
+                        slot.getId(),
                         false
                 ));
             }
