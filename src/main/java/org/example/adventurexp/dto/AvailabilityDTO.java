@@ -16,6 +16,7 @@ public class AvailabilityDTO {
     private LocalDateTime end;
     private int capacity;
     private int remaining;
+    private Long slotId;
     private boolean soldOut;
     
 }

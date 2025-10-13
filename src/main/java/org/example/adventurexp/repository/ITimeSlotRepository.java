@@ -22,4 +22,6 @@ public interface ITimeSlotRepository extends JpaRepository<TimeSlot, Long> {
     // For getAvailableSlots()
     List<TimeSlot> findByActivityAndStartsAtAfter(Activity activity, LocalDateTime startsAt);
 
+    // For getDailyAvailability()
+    List<TimeSlot> findByActivityAndStartsAtBetween(Activity activity, LocalDateTime from, LocalDateTime to);
 }
