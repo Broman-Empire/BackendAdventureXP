@@ -12,9 +12,20 @@ services:
       - "127.0.0.1:8080:8080"
     environment:
       # SPRING_PROFILES_ACTIVE: Hvis man vil have flere miljøer = prod, dev, docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${DB_NAME} # Så Spring Boot kan læse DB
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
       DB_NAME: ${DB_NAME}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create # ændrer til update, når scriptet reelt må opdateres
+  frontend:
+    build:
+      context: ./FrontendAdventureXP
+      dockerfile: Dockerfile
+    container_name: adventurexp-frontend
+    depends_on:
+      - backend
+    ports:
+      - "127.0.0.1:3000:80"
 
   mysql:
     image: mysql:latest
